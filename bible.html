@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scriptura — The Living Word</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --parchment: #f8f3e8;
+    --parchment-dark: #ede5d0;
+    --ink: #2c2418;
+    --ink-light: #5c4f3a;
+    --ink-faint: #9e8e72;
+    --gold: #b8862a;
+    --gold-light: #d4a843;
+    --gold-pale: #f0dfa0;
+    --crimson: #8b2635;
+    --crimson-light: #c04050;
+    --sage: #4a6741;
+    --cream: #fdf9f0;
+    --border: #d4c4a0;
+    --shadow: rgba(44, 36, 24, 0.12);
+    --blue: #1e4d8c;
+    --blue-light: #3a6db5;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background-color: var(--parchment);
+    color: var(--ink);
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 18px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at 20% 10%, rgba(184,134,42,0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 90%, rgba(139,38,53,0.05) 0%, transparent 50%);
+  }
+  header {
+    background: var(--ink);
+    color: var(--parchment);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+  }
+  .header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    height: 64px;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .logo { display: flex; align-items: baseline; gap: 0.5rem; text-decoration: none; }
+  .logo-word { font-family: 'IM Fell English', Georgia, serif; font-size: 1.7rem; color: var(--gold-light); letter-spacing: 0.02em; }
+  .logo-sub { font-family: 'Crimson Pro', serif; font-size: 0.75rem; color: var(--ink-faint); letter-spacing: 0.15em; text-transform: uppercase; font-style: italic; }
+  nav { display: flex; gap: 0.25rem; align-items: center; flex-wrap: wrap; }
+  nav button {
+    background: none; border: none; color: var(--parchment-dark);
+    font-family: 'Crimson Pro', serif; font-size: 0.9rem; letter-spacing: 0.06em;
+    text-transform: uppercase; padding: 0.5rem 0.85rem; cursor: pointer;
+    border-radius: 4px; transition: all 0.2s; position: relative;
+  }
+  nav button:hover, nav button.active { color: var(--gold-light); background: rgba(255,255,255,0.06); }
+  nav button.active::after {
+    content: ''; position: absolute; bottom: -2px; left: 1rem; right: 1rem;
+    height: 2px; background: var(--gold-light); border-radius: 1px;
+  }
+  main { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+  .page { display: none; }
+  .page.active { display: block; animation: fadeIn 0.35s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── HOME ── */
+  .home-hero { text-align: center; padding: 3rem 0 2rem; }
+  .home-hero::before { content: '✦'; display: block; font-size: 1.2rem; color: var(--gold); margin-bottom: 1rem; opacity: 0.6; }
+  .home-title { font-family: 'Playfair Display', Georgia, serif; font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 400; color: var(--ink); line-height: 1.2; margin-bottom: 0.5rem; }
+  .home-subtitle { font-family: 'Crimson Pro', serif; font-style: italic; color: var(--ink-faint); font-size: 1.1rem; margin-bottom: 2.5rem; }
+  .search-bar {
+    display: flex; max-width: 620px; margin: 0 auto 3rem;
+    background: white; border: 1.5px solid var(--border);
+    border-radius: 50px; overflow: hidden; box-shadow: 0 4px 20px var(--shadow); transition: box-shadow 0.2s;
+  }
+  .search-bar:focus-within { box-shadow: 0 6px 30px rgba(184,134,42,0.2); border-color: var(--gold); }
+  .search-bar input { flex: 1; border: none; outline: none; padding: 0.9rem 1.5rem; font-family: 'Crimson Pro', serif; font-size: 1.05rem; color: var(--ink); background: transparent; }
+  .search-bar input::placeholder { color: var(--ink-faint); font-style: italic; }
+  .search-bar button { background: var(--ink); color: var(--gold-light); border: none; padding: 0 1.6rem; font-family: 'Crimson Pro', serif; font-size: 0.9rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: background 0.2s; }
+  .search-bar button:hover { background: var(--crimson); }
+  .qotd-card {
+    background: var(--ink); color: var(--parchment); border-radius: 16px;
+    padding: 2.5rem 3rem; position: relative; overflow: hidden; margin-bottom: 1.5rem;
+    box-shadow: 0 8px 40px rgba(44,36,24,0.2);
+  }
+  .qotd-card::before {
+    content: '\201C'; font-family: 'Playfair Display', serif; font-size: 14rem;
+    color: rgba(184,134,42,0.12); position: absolute; top: -2rem; left: 1rem;
+    line-height: 1; pointer-events: none;
+  }
+  .qotd-label { font-family: 'Crimson Pro', serif; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-light); margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.6rem; }
+  .qotd-label::before, .qotd-label::after { content: ''; flex: 1; max-width: 40px; height: 1px; background: var(--gold); opacity: 0.4; }
+  .qotd-verse { font-family: 'Playfair Display', Georgia, serif; font-size: clamp(1.2rem, 3vw, 1.7rem); font-style: italic; font-weight: 400; line-height: 1.55; color: var(--parchment); margin-bottom: 1rem; position: relative; z-index: 1; }
+  .qotd-ref { font-family: 'Crimson Pro', serif; font-size: 0.95rem; color: var(--gold-light); font-style: normal; letter-spacing: 0.04em; }
+  .qotd-actions { margin-top: 1.5rem; display: flex; gap: 0.75rem; flex-wrap: wrap; }
+  .btn-ghost { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: var(--parchment-dark); padding: 0.5rem 1.2rem; border-radius: 50px; font-family: 'Crimson Pro', serif; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; letter-spacing: 0.04em; }
+  .btn-ghost:hover { background: rgba(184,134,42,0.2); border-color: var(--gold); color: var(--gold-light); }
+  .btn-ghost.liked { background: rgba(139,38,53,0.25); border-color: var(--crimson-light); color: #ff8a97; }
+  .btn-ghost.active-msg { background: rgba(30,77,140,0.3); border-color: #3a6db5; color: #90b8f0; }
+
+  /* ── PUBLIC COMMENTS ── */
+  .comments-section {
+    background: rgba(255,255,255,0.06); border-top: 1px solid rgba(184,134,42,0.2);
+    margin-top: 1.5rem; padding-top: 1.5rem; position: relative; z-index: 1;
+  }
+  .comments-title { font-family: 'Crimson Pro', serif; font-size: 0.75rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold-light); margin-bottom: 1rem; }
+  .comment-input-row { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+  .comment-name-input, .comment-text-input {
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px; padding: 0.5rem 0.8rem; font-family: 'Crimson Pro', serif;
+    font-size: 0.95rem; color: var(--parchment); outline: none; transition: border-color 0.2s;
+  }
+  .comment-name-input { width: 130px; flex-shrink: 0; }
+  .comment-text-input { flex: 1; }
+  .comment-name-input::placeholder, .comment-text-input::placeholder { color: rgba(158,142,114,0.7); font-style: italic; }
+  .comment-name-input:focus, .comment-text-input:focus { border-color: var(--gold); }
+  .btn-comment { background: rgba(184,134,42,0.25); border: 1px solid var(--gold); color: var(--gold-light); padding: 0.5rem 1rem; border-radius: 8px; font-family: 'Crimson Pro', serif; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+  .btn-comment:hover { background: rgba(184,134,42,0.4); }
+  .comments-list { display: flex; flex-direction: column; gap: 0.6rem; max-height: 220px; overflow-y: auto; }
+  .comment-item { display: flex; gap: 0.6rem; align-items: flex-start; }
+  .comment-avatar { width: 28px; height: 28px; border-radius: 50%; background: rgba(184,134,42,0.25); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: var(--gold-light); flex-shrink: 0; font-family: 'Crimson Pro', serif; font-weight: 600; }
+  .comment-body { flex: 1; }
+  .comment-author { font-size: 0.75rem; color: var(--gold-light); letter-spacing: 0.04em; margin-bottom: 0.15rem; }
+  .comment-text-display { font-size: 0.9rem; color: rgba(248,243,232,0.85); font-family: 'Crimson Pro', serif; line-height: 1.4; }
+  .comment-time { font-size: 0.72rem; color: rgba(158,142,114,0.7); margin-top: 0.1rem; }
+  .no-comments { font-style: italic; color: rgba(158,142,114,0.6); font-size: 0.9rem; font-family: 'Crimson Pro', serif; }
+
+  /* ── HOME GRID ── */
+  .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; }
+  @media (max-width: 700px) { .home-grid { grid-template-columns: 1fr; } }
+  .mini-card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px var(--shadow); }
+  .mini-card:hover { box-shadow: 0 6px 24px var(--shadow); transform: translateY(-2px); border-color: var(--gold); }
+  .mini-card-title { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 500; color: var(--ink); margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.5rem; }
+  .mini-card-icon { font-size: 1.1rem; }
+  .mini-card-text { font-family: 'Crimson Pro', serif; font-size: 0.9rem; color: var(--ink-faint); font-style: italic; line-height: 1.5; }
+
+  /* ── BIBLE READER ── */
+  .bible-controls { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px var(--shadow); }
+  .selectors-row { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: flex-end; margin-bottom: 1rem; }
+  .selector-group { display: flex; flex-direction: column; gap: 0.3rem; flex: 1; min-width: 140px; }
+  .selector-group label { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-faint); font-family: 'Crimson Pro', serif; }
+  select { background: var(--cream); border: 1.5px solid var(--border); border-radius: 8px; padding: 0.6rem 0.9rem; font-family: 'Crimson Pro', serif; font-size: 1rem; color: var(--ink); cursor: pointer; outline: none; transition: border-color 0.2s; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239e8e72' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.8rem center; padding-right: 2rem; }
+  select:focus { border-color: var(--gold); }
+  .btn-primary { background: var(--ink); color: var(--gold-light); border: none; padding: 0.65rem 1.8rem; border-radius: 8px; font-family: 'Crimson Pro', serif; font-size: 1rem; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; align-self: flex-end; }
+  .btn-primary:hover { background: var(--crimson); }
+  .passage-search { display: flex; gap: 0.75rem; }
+  .passage-search input { flex: 1; background: var(--cream); border: 1.5px solid var(--border); border-radius: 8px; padding: 0.6rem 0.9rem; font-family: 'Crimson Pro', serif; font-size: 1rem; color: var(--ink); outline: none; transition: border-color 0.2s; }
+  .passage-search input::placeholder { color: var(--ink-faint); font-style: italic; }
+  .passage-search input:focus { border-color: var(--gold); }
+  .bible-content { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 2.5rem 3rem; box-shadow: 0 2px 8px var(--shadow); min-height: 400px; }
+  @media (max-width: 600px) { .bible-content { padding: 1.5rem; } }
+  .chapter-header { text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+  .chapter-book { font-family: 'IM Fell English', Georgia, serif; font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.3rem; }
+  .chapter-title { font-family: 'Playfair Display', Georgia, serif; font-size: clamp(1.5rem, 4vw, 2.2rem); font-weight: 400; color: var(--ink); }
+  .chapter-title span { font-style: italic; color: var(--ink-light); }
+  .verse-container { display: flex; flex-direction: column; }
+  .verse { display: flex; gap: 0.75rem; padding: 0.5rem 0.5rem; border-radius: 6px; transition: background 0.15s; cursor: default; line-height: 1.7; align-items: flex-start; }
+  .verse:hover { background: var(--parchment); }
+  .verse-num { font-family: 'Crimson Pro', serif; font-size: 0.7rem; font-weight: 600; color: var(--gold); min-width: 1.6rem; padding-top: 0.25rem; text-align: right; letter-spacing: 0.03em; flex-shrink: 0; }
+  .verse-text { font-family: 'Crimson Pro', serif; font-size: 1.1rem; color: var(--ink); line-height: 1.75; flex: 1; }
+  .verse-actions { display: flex; gap: 0.3rem; opacity: 0; transition: opacity 0.15s; flex-shrink: 0; padding-top: 0.2rem; }
+  .verse:hover .verse-actions { opacity: 1; }
+  .verse-btn { background: none; border: 1px solid var(--border); border-radius: 4px; padding: 0.15rem 0.4rem; font-size: 0.75rem; cursor: pointer; color: var(--ink-faint); transition: all 0.15s; font-family: 'Crimson Pro', serif; }
+  .verse-btn:hover { background: var(--parchment-dark); color: var(--ink); border-color: var(--ink-faint); }
+  .verse-btn.saved { color: var(--gold); border-color: var(--gold); background: rgba(184,134,42,0.08); }
+  .verse-btn.liked { color: var(--crimson); border-color: var(--crimson); background: rgba(139,38,53,0.08); }
+  .verse-btn.msg-btn { color: var(--blue-light); border-color: var(--blue-light); }
+  .verse-btn.msg-btn:hover { background: rgba(30,77,140,0.08); }
+  .chapter-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+  .chapter-nav button { background: none; border: 1.5px solid var(--border); color: var(--ink-light); padding: 0.6rem 1.4rem; border-radius: 8px; font-family: 'Crimson Pro', serif; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; letter-spacing: 0.04em; }
+  .chapter-nav button:hover { background: var(--ink); color: var(--gold-light); border-color: var(--ink); }
+  .chapter-nav-center { font-family: 'Crimson Pro', serif; font-size: 0.85rem; color: var(--ink-faint); font-style: italic; }
+
+  /* ── KEYWORD SEARCH PAGE ── */
+  .keyword-search-bar { display: flex; gap: 0.75rem; margin-bottom: 1.5rem; }
+  .keyword-search-bar input { flex: 1; background: white; border: 1.5px solid var(--border); border-radius: 8px; padding: 0.75rem 1.2rem; font-family: 'Crimson Pro', serif; font-size: 1.05rem; color: var(--ink); outline: none; transition: border-color 0.2s; box-shadow: 0 2px 8px var(--shadow); }
+  .keyword-search-bar input::placeholder { color: var(--ink-faint); font-style: italic; }
+  .keyword-search-bar input:focus { border-color: var(--gold); }
+  .keyword-search-bar select { background: white; border: 1.5px solid var(--border); border-radius: 8px; padding: 0.75rem 2.2rem 0.75rem 0.9rem; font-family: 'Crimson Pro', serif; font-size: 0.95rem; color: var(--ink); outline: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239e8e72' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.8rem center; appearance: none; }
+  .search-results-meta { font-family: 'Crimson Pro', serif; font-size: 0.9rem; color: var(--ink-faint); font-style: italic; margin-bottom: 1.2rem; }
+  .search-result-card { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem 1.5rem; margin-bottom: 0.85rem; box-shadow: 0 2px 8px var(--shadow); transition: all 0.2s; cursor: pointer; }
+  .search-result-card:hover { box-shadow: 0 6px 20px var(--shadow); border-color: var(--gold); transform: translateY(-1px); }
+  .search-result-ref { font-family: 'IM Fell English', Georgia, serif; font-size: 0.8rem; letter-spacing: 0.15em; color: var(--gold); margin-bottom: 0.4rem; text-transform: uppercase; }
+  .search-result-text { font-family: 'Crimson Pro', serif; font-size: 1.05rem; color: var(--ink); line-height: 1.65; }
+  .search-result-text mark { background: rgba(184,134,42,0.18); color: var(--crimson); border-radius: 2px; padding: 0 2px; font-weight: 600; }
+  .search-result-actions { display: flex; gap: 0.4rem; margin-top: 0.75rem; }
+
+  /* ── SAVED / LIKED ── */
+  .section-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+  .section-title { font-family: 'Playfair Display', Georgia, serif; font-size: 1.8rem; font-weight: 400; color: var(--ink); }
+  .section-count { font-family: 'Crimson Pro', serif; font-size: 0.85rem; color: var(--ink-faint); font-style: italic; }
+  .quote-card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 2rem; margin-bottom: 1rem; position: relative; box-shadow: 0 2px 8px var(--shadow); transition: all 0.2s; }
+  .quote-card:hover { box-shadow: 0 6px 20px var(--shadow); transform: translateY(-1px); }
+  .quote-card-text { font-family: 'Playfair Display', Georgia, serif; font-size: 1.1rem; font-style: italic; color: var(--ink); line-height: 1.65; margin-bottom: 0.75rem; }
+  .quote-card-ref { font-family: 'Crimson Pro', serif; font-size: 0.85rem; color: var(--gold); letter-spacing: 0.04em; }
+  .quote-card-actions { position: absolute; top: 1rem; right: 1rem; display: flex; gap: 0.4rem; }
+  .icon-btn { background: none; border: none; cursor: pointer; font-size: 1rem; padding: 0.3rem; border-radius: 4px; transition: all 0.15s; color: var(--ink-faint); }
+  .icon-btn:hover { color: var(--crimson); background: rgba(139,38,53,0.08); }
+  .empty-state { text-align: center; padding: 4rem 2rem; color: var(--ink-faint); }
+  .empty-state-icon { font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.4; }
+  .empty-state-text { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.1rem; }
+  .empty-state-sub { font-family: 'Crimson Pro', serif; font-size: 0.9rem; margin-top: 0.5rem; }
+  .loading { text-align: center; padding: 3rem; color: var(--ink-faint); font-family: 'Crimson Pro', serif; font-style: italic; font-size: 1.1rem; }
+  .loading::after { content: '...'; animation: dots 1.5s steps(3, end) infinite; }
+  @keyframes dots { 0%,33%{content:'.'} 34%,66%{content:'..'} 67%,100%{content:'...'} }
+
+  /* ── MESSAGES / FRIENDS PAGE ── */
+  .msg-layout { display: grid; grid-template-columns: 280px 1fr; gap: 1.5rem; min-height: 560px; }
+  @media (max-width: 750px) { .msg-layout { grid-template-columns: 1fr; } }
+  .friends-panel { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 0; box-shadow: 0 2px 8px var(--shadow); display: flex; flex-direction: column; overflow: hidden; }
+  .friends-panel-header { padding: 1.2rem 1.3rem; border-bottom: 1px solid var(--border); background: var(--parchment-dark); }
+  .friends-panel-title { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 500; color: var(--ink); margin-bottom: 0.6rem; }
+  .my-code { display: flex; align-items: center; gap: 0.5rem; background: var(--parchment); border: 1px solid var(--border); border-radius: 6px; padding: 0.4rem 0.7rem; }
+  .my-code-label { font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); font-family: 'Crimson Pro', serif; }
+  .my-code-val { font-family: 'IM Fell English', Georgia, serif; font-size: 1rem; color: var(--ink); letter-spacing: 0.06em; flex: 1; }
+  .copy-code-btn { background: none; border: none; cursor: pointer; font-size: 0.8rem; color: var(--ink-faint); padding: 0.1rem 0.3rem; border-radius: 3px; transition: all 0.15s; }
+  .copy-code-btn:hover { color: var(--gold); background: rgba(184,134,42,0.1); }
+  .add-friend-row { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
+  .add-friend-input { flex: 1; background: white; border: 1px solid var(--border); border-radius: 6px; padding: 0.4rem 0.6rem; font-family: 'Crimson Pro', serif; font-size: 0.9rem; color: var(--ink); outline: none; min-width: 0; }
+  .add-friend-input:focus { border-color: var(--gold); }
+  .add-friend-btn { background: var(--ink); color: var(--gold-light); border: none; padding: 0.4rem 0.8rem; border-radius: 6px; font-family: 'Crimson Pro', serif; font-size: 0.85rem; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
+  .add-friend-btn:hover { background: var(--crimson); }
+  .friends-list { flex: 1; overflow-y: auto; padding: 0.5rem; }
+  .friend-item { display: flex; align-items: center; gap: 0.7rem; padding: 0.7rem 0.8rem; border-radius: 8px; cursor: pointer; transition: background 0.15s; position: relative; }
+  .friend-item:hover { background: var(--parchment); }
+  .friend-item.active { background: var(--parchment-dark); }
+  .friend-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--parchment-dark); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: 'IM Fell English', serif; font-size: 0.95rem; color: var(--ink-light); flex-shrink: 0; }
+  .friend-name { font-family: 'Crimson Pro', serif; font-size: 1rem; color: var(--ink); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .friend-unread { background: var(--crimson); color: white; font-size: 0.65rem; font-weight: 700; min-width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Crimson Pro', serif; }
+  .remove-friend-btn { background: none; border: none; color: var(--ink-faint); cursor: pointer; font-size: 0.7rem; padding: 0.2rem; opacity: 0; transition: opacity 0.15s; }
+  .friend-item:hover .remove-friend-btn { opacity: 1; }
+  .chat-panel { background: white; border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 2px 8px var(--shadow); display: flex; flex-direction: column; overflow: hidden; min-height: 400px; }
+  .chat-header { padding: 1.1rem 1.4rem; border-bottom: 1px solid var(--border); background: var(--parchment-dark); display: flex; align-items: center; gap: 0.8rem; }
+  .chat-header-name { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 500; color: var(--ink); }
+  .chat-header-sub { font-family: 'Crimson Pro', serif; font-size: 0.8rem; color: var(--ink-faint); font-style: italic; }
+  .chat-messages { flex: 1; overflow-y: auto; padding: 1.2rem; display: flex; flex-direction: column; gap: 1rem; min-height: 300px; max-height: 420px; }
+  .chat-no-friend { flex: 1; display: flex; align-items: center; justify-content: center; text-align: center; color: var(--ink-faint); font-family: 'Crimson Pro', serif; font-style: italic; padding: 2rem; }
+  .msg-bubble { max-width: 85%; display: flex; flex-direction: column; gap: 0.3rem; }
+  .msg-bubble.mine { align-self: flex-end; align-items: flex-end; }
+  .msg-bubble.theirs { align-self: flex-start; align-items: flex-start; }
+  .msg-quote-box { border-radius: 10px; padding: 0.9rem 1.1rem; position: relative; }
+  .msg-bubble.mine .msg-quote-box { background: var(--ink); color: var(--parchment); border-bottom-right-radius: 2px; }
+  .msg-bubble.theirs .msg-quote-box { background: var(--parchment-dark); border: 1px solid var(--border); color: var(--ink); border-bottom-left-radius: 2px; }
+  .msg-quote-text { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 0.9rem; line-height: 1.5; margin-bottom: 0.4rem; }
+  .msg-bubble.mine .msg-quote-text { color: var(--parchment); }
+  .msg-bubble.theirs .msg-quote-text { color: var(--ink); }
+  .msg-quote-ref { font-family: 'Crimson Pro', serif; font-size: 0.75rem; color: var(--gold); }
+  .msg-time { font-size: 0.7rem; color: var(--ink-faint); font-family: 'Crimson Pro', serif; margin: 0 0.3rem; }
+  .msg-sender { font-size: 0.75rem; color: var(--ink-faint); font-family: 'Crimson Pro', serif; }
+  .msg-reactions { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+  .reaction-pill { background: var(--parchment-dark); border: 1px solid var(--border); border-radius: 20px; padding: 0.15rem 0.5rem; font-size: 1rem; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 0.2rem; }
+  .reaction-pill:hover { border-color: var(--gold); background: rgba(184,134,42,0.08); }
+  .reaction-pill .r-count { font-size: 0.7rem; color: var(--ink-faint); font-family: 'Crimson Pro', serif; }
+  .add-reaction-btn { background: none; border: 1px dashed var(--border); border-radius: 20px; padding: 0.15rem 0.5rem; font-size: 0.75rem; cursor: pointer; color: var(--ink-faint); font-family: 'Crimson Pro', serif; transition: all 0.15s; }
+  .add-reaction-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .emoji-picker { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 0.6rem; box-shadow: 0 4px 20px var(--shadow); display: flex; flex-wrap: wrap; gap: 0.4rem; max-width: 200px; z-index: 50; }
+  .emoji-opt { font-size: 1.1rem; cursor: pointer; padding: 0.2rem 0.3rem; border-radius: 4px; transition: background 0.1s; }
+  .emoji-opt:hover { background: var(--parchment-dark); }
+  .chat-empty { display: flex; flex: 1; align-items: center; justify-content: center; color: var(--ink-faint); font-family: 'Crimson Pro', serif; font-style: italic; font-size: 0.95rem; padding: 2rem; text-align: center; }
+  .no-friends-msg { padding: 2rem 1rem; text-align: center; color: var(--ink-faint); font-family: 'Crimson Pro', serif; font-style: italic; font-size: 0.9rem; }
+
+  /* ── SHARE MODAL ── */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(44,36,24,0.6); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+  .modal-overlay.hidden { display: none; }
+  .modal-box { background: var(--parchment); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; max-width: 480px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+  .modal-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 400; color: var(--ink); margin-bottom: 1.2rem; }
+  .share-verse-preview { background: var(--ink); color: var(--parchment); border-radius: 10px; padding: 1rem 1.2rem; margin-bottom: 1.2rem; font-family: 'Playfair Display', serif; font-style: italic; font-size: 0.95rem; line-height: 1.5; }
+  .share-verse-ref { font-size: 0.8rem; color: var(--gold-light); font-style: normal; margin-top: 0.4rem; }
+  .modal-label { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-faint); font-family: 'Crimson Pro', serif; margin-bottom: 0.5rem; }
+  .friends-checklist { display: flex; flex-direction: column; gap: 0.5rem; max-height: 200px; overflow-y: auto; margin-bottom: 1.2rem; }
+  .friend-check { display: flex; align-items: center; gap: 0.7rem; padding: 0.5rem 0.7rem; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.15s; background: white; }
+  .friend-check:hover { border-color: var(--gold); }
+  .friend-check.selected { border-color: var(--gold); background: rgba(184,134,42,0.06); }
+  .friend-check input[type=checkbox] { accent-color: var(--gold); width: 14px; height: 14px; }
+  .friend-check-name { font-family: 'Crimson Pro', serif; font-size: 0.95rem; color: var(--ink); }
+  .modal-actions { display: flex; gap: 0.75rem; justify-content: flex-end; }
+  .btn-cancel { background: none; border: 1.5px solid var(--border); color: var(--ink-faint); padding: 0.55rem 1.3rem; border-radius: 8px; font-family: 'Crimson Pro', serif; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; }
+  .btn-cancel:hover { border-color: var(--ink-faint); color: var(--ink); }
+  .btn-send { background: var(--ink); color: var(--gold-light); border: none; padding: 0.55rem 1.6rem; border-radius: 8px; font-family: 'Crimson Pro', serif; font-size: 0.95rem; cursor: pointer; transition: background 0.2s; }
+  .btn-send:hover { background: var(--crimson); }
+  .no-friends-note { font-family: 'Crimson Pro', serif; font-style: italic; font-size: 0.9rem; color: var(--ink-faint); padding: 0.5rem; }
+
+  /* ── TOAST ── */
+  .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--ink); color: var(--parchment); padding: 0.8rem 1.8rem; border-radius: 50px; font-family: 'Crimson Pro', serif; font-size: 0.95rem; box-shadow: 0 8px 30px rgba(0,0,0,0.3); z-index: 999; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); pointer-events: none; border: 1px solid rgba(184,134,42,0.3); }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .ornament { text-align: center; color: var(--gold); font-size: 1rem; margin: 2rem 0; opacity: 0.5; letter-spacing: 1rem; }
+  .translation-badge { display: inline-block; background: var(--parchment-dark); border: 1px solid var(--border); border-radius: 4px; padding: 0.1rem 0.5rem; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); font-family: 'Crimson Pro', serif; vertical-align: middle; margin-left: 0.5rem; }
+  ::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-track { background: var(--parchment); } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; } ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a class="logo" href="#" onclick="showPage('home')">
+      <span class="logo-word">Scriptura</span>
+      <span class="logo-sub">The Living Word</span>
+    </a>
+    <nav>
+      <button onclick="showPage('home')" id="nav-home" class="active">Home</button>
+      <button onclick="showPage('bible')" id="nav-bible">Read</button>
+      <button onclick="showPage('search')" id="nav-search">Search</button>
+      <button onclick="showPage('saved')" id="nav-saved">Saved</button>
+      <button onclick="showPage('liked')" id="nav-liked">Liked</button>
+      <button onclick="showPage('messages')" id="nav-messages">✉ Messages</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- ══════════════ HOME ══════════════ -->
+  <div id="page-home" class="page active">
+    <div class="home-hero">
+      <h1 class="home-title">The Living Word</h1>
+      <p class="home-subtitle">Search, read, and reflect upon the Holy Scriptures</p>
+      <div class="search-bar">
+        <input type="text" id="hero-search" placeholder="Search a passage, verse, or keyword…" onkeydown="if(event.key==='Enter') heroSearch()">
+        <button onclick="heroSearch()">Search</button>
+      </div>
+    </div>
+
+    <div class="qotd-card" id="qotd-card">
+      <div class="qotd-label">Quote of the Day</div>
+      <p class="qotd-verse" id="qotd-verse">Loading today's verse…</p>
+      <div class="qotd-ref" id="qotd-ref"></div>
+      <div class="qotd-actions">
+        <button class="btn-ghost" onclick="likeQotd()" id="qotd-like-btn">♡ Like</button>
+        <button class="btn-ghost" onclick="saveQotd()" id="qotd-save-btn">☆ Save</button>
+        <button class="btn-ghost" onclick="shareQotdToFriend()" id="qotd-msg-btn">✉ Send</button>
+        <button class="btn-ghost" onclick="copyQotd()">⬆ Copy</button>
+      </div>
+      <!-- Public Comments -->
+      <div class="comments-section">
+        <div class="comments-title">Community Reflections</div>
+        <div class="comment-input-row">
+          <input class="comment-name-input" id="comment-name" placeholder="Your name" maxlength="24">
+          <input class="comment-text-input" id="comment-text" placeholder="Share your reflection…" maxlength="200" onkeydown="if(event.key==='Enter') postComment()">
+          <button class="btn-comment" onclick="postComment()">Post</button>
+        </div>
+        <div class="comments-list" id="comments-list">
+          <span class="no-comments">Be the first to share a reflection…</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="ornament">✦ ✦ ✦</div>
+
+    <div class="home-grid">
+      <div class="mini-card" onclick="showPage('bible')">
+        <div class="mini-card-title"><span class="mini-card-icon">📖</span> Read the Bible</div>
+        <p class="mini-card-text">Browse book by book, chapter by chapter. From Genesis to Revelation.</p>
+      </div>
+      <div class="mini-card" onclick="showPage('search')">
+        <div class="mini-card-title"><span class="mini-card-icon">🔍</span> Keyword Search</div>
+        <p class="mini-card-text">Find verses across all of Scripture by keyword or phrase.</p>
+      </div>
+      <div class="mini-card" onclick="showPage('saved')">
+        <div class="mini-card-title"><span class="mini-card-icon">☆</span> Saved Verses</div>
+        <p class="mini-card-text">Your personal collection of saved scripture passages and verses.</p>
+      </div>
+      <div class="mini-card" onclick="showPage('messages')">
+        <div class="mini-card-title"><span class="mini-card-icon">✉</span> Scripture Chat</div>
+        <p class="mini-card-text">Share verses with friends and react with emoji.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ BIBLE READER ══════════════ -->
+  <div id="page-bible" class="page">
+    <div class="bible-controls">
+      <div class="selectors-row">
+        <div class="selector-group">
+          <label>Translation</label>
+          <select id="translation-select" onchange="loadChapter()">
+            <option value="kjv">KJV — King James Version</option>
+            <option value="web">WEB — World English Bible</option>
+          </select>
+        </div>
+        <div class="selector-group">
+          <label>Book</label>
+          <select id="book-select" onchange="updateChapters()"></select>
+        </div>
+        <div class="selector-group" style="min-width:90px; max-width:120px">
+          <label>Chapter</label>
+          <select id="chapter-select" onchange="loadChapter()"></select>
+        </div>
+      </div>
+      <div class="passage-search">
+        <input type="text" id="passage-input" placeholder="Or type a reference, e.g. John 3:16  or  Psalm 23" onkeydown="if(event.key==='Enter') searchPassage()">
+        <button class="btn-primary" onclick="searchPassage()">Go</button>
+      </div>
+    </div>
+    <div class="bible-content" id="bible-content">
+      <div class="loading">Preparing the Word</div>
+    </div>
+  </div>
+
+  <!-- ══════════════ KEYWORD SEARCH ══════════════ -->
+  <div id="page-search" class="page">
+    <div class="section-header">
+      <h2 class="section-title">Search the Scriptures</h2>
+    </div>
+    <div class="keyword-search-bar">
+      <input type="text" id="keyword-input" placeholder="e.g. love thy neighbour, forgiveness, light of the world…" onkeydown="if(event.key==='Enter') doKeywordSearch()">
+      <select id="keyword-translation">
+        <option value="kjv">KJV</option>
+        <option value="web">WEB</option>
+      </select>
+      <button class="btn-primary" onclick="doKeywordSearch()">Search</button>
+    </div>
+    <div id="keyword-results"></div>
+  </div>
+
+  <!-- ══════════════ SAVED ══════════════ -->
+  <div id="page-saved" class="page">
+    <div class="section-header">
+      <h2 class="section-title">Saved Verses</h2>
+      <span class="section-count" id="saved-count"></span>
+    </div>
+    <div id="saved-list"></div>
+  </div>
+
+  <!-- ══════════════ LIKED ══════════════ -->
+  <div id="page-liked" class="page">
+    <div class="section-header">
+      <h2 class="section-title">Liked Verses</h2>
+      <span class="section-count" id="liked-count"></span>
+    </div>
+    <div id="liked-list"></div>
+  </div>
+
+  <!-- ══════════════ MESSAGES ══════════════ -->
+  <div id="page-messages" class="page">
+    <div class="section-header">
+      <h2 class="section-title">Scripture Messenger</h2>
+      <span class="section-count">Share verses with friends</span>
+    </div>
+    <div class="msg-layout">
+      <!-- Friends Sidebar -->
+      <div class="friends-panel">
+        <div class="friends-panel-header">
+          <div class="friends-panel-title">Friends</div>
+          <div class="my-code">
+            <span class="my-code-label">Your code:</span>
+            <span class="my-code-val" id="my-code-display">——————</span>
+            <button class="copy-code-btn" onclick="copyMyCode()" title="Copy code">⎘</button>
+          </div>
+          <div class="add-friend-row">
+            <input class="add-friend-input" id="add-friend-input" placeholder="Friend's code or name" maxlength="30" onkeydown="if(event.key==='Enter') addFriend()">
+            <button class="add-friend-btn" onclick="addFriend()">+ Add</button>
+          </div>
+        </div>
+        <div class="friends-list" id="friends-list">
+          <div class="no-friends-msg">Add a friend using their 10-digit code to start sharing verses.</div>
+        </div>
+      </div>
+      <!-- Chat Panel -->
+      <div class="chat-panel" id="chat-panel">
+        <div class="chat-no-friend" id="chat-no-friend">
+          <div>
+            <div style="font-size:2rem;margin-bottom:0.8rem;opacity:0.3">✉</div>
+            <div>Select a friend to begin sharing scripture</div>
+          </div>
+        </div>
+        <div id="chat-active" style="display:none;flex-direction:column;height:100%">
+          <div class="chat-header">
+            <div class="friend-avatar" id="chat-avatar">?</div>
+            <div>
+              <div class="chat-header-name" id="chat-header-name">—</div>
+              <div class="chat-header-sub">Scripture sharing only · Reactions enabled</div>
+            </div>
+          </div>
+          <div class="chat-messages" id="chat-messages"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ══════════════ SHARE VERSE MODAL ══════════════ -->
+<div class="modal-overlay hidden" id="share-modal">
+  <div class="modal-box">
+    <div class="modal-title">Send this Verse</div>
+    <div class="share-verse-preview" id="share-preview-text">
+      <div id="share-preview-verse"></div>
+      <div class="share-verse-ref" id="share-preview-ref"></div>
+    </div>
+    <div class="modal-label">Send to</div>
+    <div class="friends-checklist" id="share-friends-list"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeShareModal()">Cancel</button>
+      <button class="btn-send" onclick="sendVerseToFriends()">Send ✉</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+//  BOOKS DATA
+// ══════════════════════════════════════════
+const BOOKS = [
+  {name:"Genesis",abbr:"Gen",chapters:50,testament:"OT"},{name:"Exodus",abbr:"Exo",chapters:40,testament:"OT"},
+  {name:"Leviticus",abbr:"Lev",chapters:27,testament:"OT"},{name:"Numbers",abbr:"Num",chapters:36,testament:"OT"},
+  {name:"Deuteronomy",abbr:"Deu",chapters:34,testament:"OT"},{name:"Joshua",abbr:"Jos",chapters:24,testament:"OT"},
+  {name:"Judges",abbr:"Jdg",chapters:21,testament:"OT"},{name:"Ruth",abbr:"Rut",chapters:4,testament:"OT"},
+  {name:"1 Samuel",abbr:"1Sa",chapters:31,testament:"OT"},{name:"2 Samuel",abbr:"2Sa",chapters:24,testament:"OT"},
+  {name:"1 Kings",abbr:"1Ki",chapters:22,testament:"OT"},{name:"2 Kings",abbr:"2Ki",chapters:25,testament:"OT"},
+  {name:"1 Chronicles",abbr:"1Ch",chapters:29,testament:"OT"},{name:"2 Chronicles",abbr:"2Ch",chapters:36,testament:"OT"},
+  {name:"Ezra",abbr:"Ezr",chapters:10,testament:"OT"},{name:"Nehemiah",abbr:"Neh",chapters:13,testament:"OT"},
+  {name:"Esther",abbr:"Est",chapters:10,testament:"OT"},{name:"Job",abbr:"Job",chapters:42,testament:"OT"},
+  {name:"Psalms",abbr:"Psa",chapters:150,testament:"OT"},{name:"Proverbs",abbr:"Pro",chapters:31,testament:"OT"},
+  {name:"Ecclesiastes",abbr:"Ecc",chapters:12,testament:"OT"},{name:"Song of Solomon",abbr:"Son",chapters:8,testament:"OT"},
+  {name:"Isaiah",abbr:"Isa",chapters:66,testament:"OT"},{name:"Jeremiah",abbr:"Jer",chapters:52,testament:"OT"},
+  {name:"Lamentations",abbr:"Lam",chapters:5,testament:"OT"},{name:"Ezekiel",abbr:"Eze",chapters:48,testament:"OT"},
+  {name:"Daniel",abbr:"Dan",chapters:12,testament:"OT"},{name:"Hosea",abbr:"Hos",chapters:14,testament:"OT"},
+  {name:"Joel",abbr:"Joe",chapters:3,testament:"OT"},{name:"Amos",abbr:"Amo",chapters:9,testament:"OT"},
+  {name:"Obadiah",abbr:"Oba",chapters:1,testament:"OT"},{name:"Jonah",abbr:"Jon",chapters:4,testament:"OT"},
+  {name:"Micah",abbr:"Mic",chapters:7,testament:"OT"},{name:"Nahum",abbr:"Nah",chapters:3,testament:"OT"},
+  {name:"Habakkuk",abbr:"Hab",chapters:3,testament:"OT"},{name:"Zephaniah",abbr:"Zep",chapters:3,testament:"OT"},
+  {name:"Haggai",abbr:"Hag",chapters:2,testament:"OT"},{name:"Zechariah",abbr:"Zec",chapters:14,testament:"OT"},
+  {name:"Malachi",abbr:"Mal",chapters:4,testament:"OT"},
+  {name:"Matthew",abbr:"Mat",chapters:28,testament:"NT"},{name:"Mark",abbr:"Mar",chapters:16,testament:"NT"},
+  {name:"Luke",abbr:"Luk",chapters:24,testament:"NT"},{name:"John",abbr:"Joh",chapters:21,testament:"NT"},
+  {name:"Acts",abbr:"Act",chapters:28,testament:"NT"},{name:"Romans",abbr:"Rom",chapters:16,testament:"NT"},
+  {name:"1 Corinthians",abbr:"1Co",chapters:16,testament:"NT"},{name:"2 Corinthians",abbr:"2Co",chapters:13,testament:"NT"},
+  {name:"Galatians",abbr:"Gal",chapters:6,testament:"NT"},{name:"Ephesians",abbr:"Eph",chapters:6,testament:"NT"},
+  {name:"Philippians",abbr:"Phi",chapters:4,testament:"NT"},{name:"Colossians",abbr:"Col",chapters:4,testament:"NT"},
+  {name:"1 Thessalonians",abbr:"1Th",chapters:5,testament:"NT"},{name:"2 Thessalonians",abbr:"2Th",chapters:3,testament:"NT"},
+  {name:"1 Timothy",abbr:"1Ti",chapters:6,testament:"NT"},{name:"2 Timothy",abbr:"2Ti",chapters:4,testament:"NT"},
+  {name:"Titus",abbr:"Tit",chapters:3,testament:"NT"},{name:"Philemon",abbr:"Phm",chapters:1,testament:"NT"},
+  {name:"Hebrews",abbr:"Heb",chapters:13,testament:"NT"},{name:"James",abbr:"Jam",chapters:5,testament:"NT"},
+  {name:"1 Peter",abbr:"1Pe",chapters:5,testament:"NT"},{name:"2 Peter",abbr:"2Pe",chapters:3,testament:"NT"},
+  {name:"1 John",abbr:"1Jo",chapters:5,testament:"NT"},{name:"2 John",abbr:"2Jo",chapters:1,testament:"NT"},
+  {name:"3 John",abbr:"3Jo",chapters:1,testament:"NT"},{name:"Jude",abbr:"Jud",chapters:1,testament:"NT"},
+  {name:"Revelation",abbr:"Rev",chapters:22,testament:"NT"},
+];
+
+const QOTD_POOL = [
+  {text:"For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.", ref:"John 3:16", book:"Joh", ch:3},
+  {text:"The Lord is my shepherd; I shall not want.", ref:"Psalm 23:1", book:"Psa", ch:23},
+  {text:"I can do all things through Christ who strengthens me.", ref:"Philippians 4:13", book:"Phi", ch:4},
+  {text:"And we know that in all things God works for the good of those who love him.", ref:"Romans 8:28", book:"Rom", ch:8},
+  {text:"Be still, and know that I am God.", ref:"Psalm 46:10", book:"Psa", ch:46},
+  {text:"Trust in the Lord with all your heart and lean not on your own understanding.", ref:"Proverbs 3:5", book:"Pro", ch:3},
+  {text:"The Lord bless you and keep you; the Lord make his face shine on you and be gracious to you.", ref:"Numbers 6:24–25", book:"Num", ch:6},
+  {text:"But those who hope in the Lord will renew their strength. They will soar on wings like eagles.", ref:"Isaiah 40:31", book:"Isa", ch:40},
+  {text:"For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you.", ref:"Jeremiah 29:11", book:"Jer", ch:29},
+  {text:"Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God.", ref:"Philippians 4:6", book:"Phi", ch:4},
+  {text:"Come to me, all you who are weary and burdened, and I will give you rest.", ref:"Matthew 11:28", book:"Mat", ch:11},
+  {text:"Love is patient, love is kind. It does not envy, it does not boast, it is not proud.", ref:"1 Corinthians 13:4", book:"1Co", ch:13},
+];
+
+// Stop words for keyword search filtering
+const STOP_WORDS = new Set([
+  'the','a','an','and','or','but','in','on','at','to','for','of','with','by','from',
+  'up','about','into','through','during','is','are','was','were','be','been','being',
+  'have','has','had','do','does','did','will','would','could','should','may','might',
+  'shall','can','need','dare','ought','used','it','its','he','she','they','we','i',
+  'you','him','her','them','us','me','my','your','his','our','their','this','that',
+  'these','those','what','which','who','whom','when','where','why','how','all','both',
+  'each','few','more','most','other','some','such','no','nor','not','only','own',
+  'same','so','than','too','very','just','then','now','also','as','if','after','before'
+]);
+
+// ══════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════
+let state = {
+  currentBook: 'Joh',
+  currentChapter: 3,
+  translation: 'kjv',
+  saved: JSON.parse(localStorage.getItem('scriptura_saved') || '[]'),
+  liked: JSON.parse(localStorage.getItem('scriptura_liked') || '[]'),
+  qotdIndex: null,
+  currentFriend: null,
+  shareVerseData: null,
+  activeEmojiMsgId: null,
+};
+
+function saveState() {
+  localStorage.setItem('scriptura_saved', JSON.stringify(state.saved));
+  localStorage.setItem('scriptura_liked', JSON.stringify(state.liked));
+}
+
+// ══════════════════════════════════════════
+//  PERSISTENT STORAGE HELPERS
+//  Uses window.storage API (persistent across sessions)
+// ══════════════════════════════════════════
+
+async function storageGet(key, shared=false) {
+  try { const r = await window.storage.get(key, shared); return r ? r.value : null; }
+  catch(e) { return null; }
+}
+async function storageSet(key, value, shared=false) {
+  try { await window.storage.set(key, value, shared); return true; }
+  catch(e) { return false; }
+}
+async function storageList(prefix, shared=false) {
+  try { const r = await window.storage.list(prefix, shared); return r ? r.keys : []; }
+  catch(e) { return []; }
+}
+
+// ══════════════════════════════════════════
+//  USER IDENTITY
+// ══════════════════════════════════════════
+
+function getMyUserId() {
+  let uid = localStorage.getItem('scriptura_uid');
+  if (!uid) {
+    uid = generateCode();
+    localStorage.setItem('scriptura_uid', uid);
+  }
+  return uid;
+}
+
+function generateCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for (let i = 0; i < 10; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return code;
+}
+
+function getMyDisplayName() {
+  return localStorage.getItem('scriptura_name') || 'Anonymous';
+}
+
+// ══════════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════════
+
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.getElementById('nav-' + page).classList.add('active');
+  if (page === 'bible') renderBible();
+  if (page === 'saved') renderSavedPage();
+  if (page === 'liked') renderLikedPage();
+  if (page === 'messages') renderMessagesPage();
+}
+
+// ══════════════════════════════════════════
+//  BIBLE SELECTORS
+// ══════════════════════════════════════════
+
+function setupSelectors() {
+  const bookSel = document.getElementById('book-select');
+  let lastTestament = '';
+  BOOKS.forEach(b => {
+    if (b.testament !== lastTestament) {
+      const og = document.createElement('optgroup');
+      og.label = b.testament === 'OT' ? '— Old Testament —' : '— New Testament —';
+      bookSel.appendChild(og);
+      lastTestament = b.testament;
+    }
+    const opt = document.createElement('option');
+    opt.value = b.abbr; opt.textContent = b.name;
+    if (b.abbr === state.currentBook) opt.selected = true;
+    bookSel.appendChild(opt);
+  });
+  updateChapters(false);
+}
+
+function updateChapters(doLoad=true) {
+  const abbr = document.getElementById('book-select').value;
+  state.currentBook = abbr;
+  const book = BOOKS.find(b => b.abbr === abbr);
+  const chSel = document.getElementById('chapter-select');
+  chSel.innerHTML = '';
+  for (let i = 1; i <= book.chapters; i++) {
+    const opt = document.createElement('option');
+    opt.value = i; opt.textContent = i;
+    if (i === state.currentChapter) opt.selected = true;
+    chSel.appendChild(opt);
+  }
+  if (doLoad) { state.currentChapter = 1; chSel.value = 1; loadChapter(); }
+}
+
+// ══════════════════════════════════════════
+//  API
+// ══════════════════════════════════════════
+
+async function fetchChapter(book, chapter, translation) {
+  const url = `https://bible-api.com/${encodeURIComponent(book)}+${chapter}?translation=${translation}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Not found');
+  return await res.json();
+}
+
+async function fetchVerse(ref, translation) {
+  const url = `https://bible-api.com/${encodeURIComponent(ref)}?translation=${translation}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Not found');
+  return await res.json();
+}
+
+// ══════════════════════════════════════════
+//  BIBLE READER
+// ══════════════════════════════════════════
+
+function renderBible() {
+  const bookSel = document.getElementById('book-select');
+  if (!bookSel.options.length) setupSelectors();
+}
+
+async function loadChapter() {
+  state.currentBook = document.getElementById('book-select').value;
+  state.currentChapter = parseInt(document.getElementById('chapter-select').value);
+  state.translation = document.getElementById('translation-select').value;
+  const content = document.getElementById('bible-content');
+  content.innerHTML = '<div class="loading">Seeking the passage</div>';
+  try {
+    const data = await fetchChapter(state.currentBook, state.currentChapter, state.translation);
+    renderChapterContent(data);
+  } catch(e) {
+    content.innerHTML = '<div class="loading">Could not load this passage. Please try another.</div>';
+  }
+}
+
+function renderChapterContent(data) {
+  const bookName = BOOKS.find(b => b.abbr === state.currentBook)?.name || state.currentBook;
+  const content = document.getElementById('bible-content');
+  const translLabel = state.translation === 'kjv' ? 'KJV' : 'WEB';
+  let html = `<div class="chapter-header"><div class="chapter-book">${bookName}</div><h2 class="chapter-title"><span>Chapter</span> ${state.currentChapter} <span class="translation-badge">${translLabel}</span></h2></div><div class="verse-container">`;
+  const verses = data.verses || [];
+  verses.forEach(v => {
+    const ref = `${bookName} ${v.chapter}:${v.verse}`;
+    const isSaved = state.saved.some(s => s.ref === ref);
+    const isLiked = state.liked.some(l => l.ref === ref);
+    const text = v.text.trim().replace(/\n/g, ' ');
+    html += `<div class="verse" id="verse-${v.verse}">
+      <span class="verse-num">${v.verse}</span>
+      <span class="verse-text">${escapeHtml(text)}</span>
+      <div class="verse-actions">
+        <button class="verse-btn ${isSaved?'saved':''}" onclick="toggleSave('${escapeAttr(ref)}','${escapeAttr(text)}')" title="Save">☆</button>
+        <button class="verse-btn ${isLiked?'liked':''}" onclick="toggleLike('${escapeAttr(ref)}','${escapeAttr(text)}')" title="Like">♡</button>
+        <button class="verse-btn msg-btn" onclick="openShareModal('${escapeAttr(ref)}','${escapeAttr(text)}')" title="Send to friend">✉</button>
+      </div>
+    </div>`;
+  });
+  const book = BOOKS.find(b => b.abbr === state.currentBook);
+  const prevCh = state.currentChapter > 1 ? state.currentChapter - 1 : null;
+  const nextCh = state.currentChapter < book.chapters ? state.currentChapter + 1 : null;
+  html += `</div><div class="chapter-nav">
+    <button onclick="navChapter(${prevCh})" ${!prevCh?'disabled style="opacity:0.3;cursor:default"':''}>← Chapter ${prevCh||''}</button>
+    <span class="chapter-nav-center">${bookName} ${state.currentChapter}</span>
+    <button onclick="navChapter(${nextCh})" ${!nextCh?'disabled style="opacity:0.3;cursor:default"':''}>Chapter ${nextCh||''} →</button>
+  </div>`;
+  content.innerHTML = html;
+}
+
+function navChapter(ch) {
+  if (!ch) return;
+  state.currentChapter = ch;
+  document.getElementById('chapter-select').value = ch;
+  loadChapter();
+  window.scrollTo({ top: document.getElementById('bible-content').offsetTop - 80, behavior: 'smooth' });
+}
+
+// ══════════════════════════════════════════
+//  KEYWORD SEARCH
+// ══════════════════════════════════════════
+
+async function doKeywordSearch() {
+  const raw = document.getElementById('keyword-input').value.trim();
+  const translation = document.getElementById('keyword-translation').value;
+  if (!raw) return;
+
+  // Extract meaningful keywords (filter stop words, short words)
+  const tokens = raw.toLowerCase().replace(/[^a-z0-9\s']/g,'').split(/\s+/).filter(w => w.length > 2 && !STOP_WORDS.has(w));
+  if (!tokens.length) {
+    document.getElementById('keyword-results').innerHTML = `<div class="search-results-meta">Please enter more specific keywords (avoid common words like "the", "and", "a")</div>`;
+    return;
+  }
+
+  const resultsDiv = document.getElementById('keyword-results');
+  resultsDiv.innerHTML = `<div class="loading">Searching the Scriptures for "${escapeHtml(tokens.join(', '))}"</div>`;
+
+  // Use bible-api.com search endpoint — search by primary keyword
+  const primaryKeyword = tokens[0];
+
+  try {
+    const url = `https://bible-api.com/?q=${encodeURIComponent(primaryKeyword)}&translation=${translation}`;
+    const res = await fetch(url);
+
+    if (!res.ok) throw new Error('Search failed');
+    const data = await res.json();
+
+    let verses = data.verses || [];
+    if (!verses.length && data.text) {
+      verses = [{ book_name: data.reference, chapter: 1, verse: 1, text: data.text }];
+    }
+
+    // Score and filter: prefer verses containing more of the keywords
+    const scored = verses.map(v => {
+      const lower = v.text.toLowerCase();
+      const score = tokens.reduce((acc, kw) => acc + (lower.includes(kw) ? 1 : 0), 0);
+      return { ...v, score };
+    }).filter(v => v.score > 0);
+
+    scored.sort((a, b) => b.score - a.score);
+    const top = scored.slice(0, 30);
+
+    if (!top.length) {
+      resultsDiv.innerHTML = `<div class="search-results-meta">No results found for "${escapeHtml(tokens.join(' '))}". Try a different keyword.</div>`;
+      return;
+    }
+
+    const translLabel = translation === 'kjv' ? 'KJV' : 'WEB';
+    resultsDiv.innerHTML = `<div class="search-results-meta">${top.length} result${top.length!==1?'s':''} for "<strong>${escapeHtml(tokens.join(', '))}</strong>" · ${translLabel}</div>` +
+      top.map(v => {
+        const ref = `${v.book_name} ${v.chapter}:${v.verse}`;
+        const text = v.text.trim().replace(/\n/g,' ');
+        // Highlight all keywords in text
+        let highlighted = escapeHtml(text);
+        tokens.forEach(kw => {
+          const re = new RegExp(`(${kw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
+          highlighted = highlighted.replace(re, '<mark>$1</mark>');
+        });
+        const isSaved = state.saved.some(s => s.ref === ref);
+        const isLiked = state.liked.some(l => l.ref === ref);
+        return `<div class="search-result-card">
+          <div class="search-result-ref">${escapeHtml(ref)}</div>
+          <div class="search-result-text">${highlighted}</div>
+          <div class="search-result-actions">
+            <button class="verse-btn ${isSaved?'saved':''}" onclick="toggleSave('${escapeAttr(ref)}','${escapeAttr(text)}')">☆ Save</button>
+            <button class="verse-btn ${isLiked?'liked':''}" onclick="toggleLike('${escapeAttr(ref)}','${escapeAttr(text)}')">♡ Like</button>
+            <button class="verse-btn msg-btn" onclick="openShareModal('${escapeAttr(ref)}','${escapeAttr(text)}')">✉ Send</button>
+          </div>
+        </div>`;
+      }).join('');
+  } catch(e) {
+    resultsDiv.innerHTML = `<div class="search-results-meta">Could not complete search. Please try again.</div>`;
+  }
+}
+
+// ══════════════════════════════════════════
+//  SAVE / LIKE
+// ══════════════════════════════════════════
+
+function toggleSave(ref, text) {
+  const idx = state.saved.findIndex(s => s.ref === ref);
+  if (idx >= 0) { state.saved.splice(idx, 1); showToast('Verse removed from saved'); }
+  else { state.saved.push({ ref, text, date: Date.now() }); showToast('Verse saved ☆'); }
+  saveState();
+}
+
+function toggleLike(ref, text) {
+  const idx = state.liked.findIndex(l => l.ref === ref);
+  if (idx >= 0) { state.liked.splice(idx, 1); showToast('Like removed'); }
+  else { state.liked.push({ ref, text, date: Date.now() }); showToast('Verse liked ♡'); }
+  saveState();
+}
+
+// ══════════════════════════════════════════
+//  QUOTE OF THE DAY
+// ══════════════════════════════════════════
+
+function loadQotd() {
+  const today = new Date();
+  const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 86400000);
+  const idx = dayOfYear % QOTD_POOL.length;
+  state.qotdIndex = idx;
+  const q = QOTD_POOL[idx];
+  document.getElementById('qotd-verse').textContent = `"${q.text}"`;
+  document.getElementById('qotd-ref').textContent = `— ${q.ref}`;
+  const isLiked = state.liked.some(l => l.ref === q.ref);
+  const isSaved = state.saved.some(s => s.ref === q.ref);
+  if (isLiked) document.getElementById('qotd-like-btn').classList.add('liked');
+  if (isSaved) document.getElementById('qotd-save-btn').textContent = '★ Saved';
+  loadComments(idx);
+}
+
+function likeQotd() {
+  const q = QOTD_POOL[state.qotdIndex];
+  toggleLike(q.ref, q.text);
+  const btn = document.getElementById('qotd-like-btn');
+  btn.classList.toggle('liked');
+  btn.textContent = btn.classList.contains('liked') ? '♥ Liked' : '♡ Like';
+}
+function saveQotd() {
+  const q = QOTD_POOL[state.qotdIndex];
+  toggleSave(q.ref, q.text);
+  document.getElementById('qotd-save-btn').textContent = state.saved.some(s => s.ref === q.ref) ? '★ Saved' : '☆ Save';
+}
+function copyQotd() {
+  const q = QOTD_POOL[state.qotdIndex];
+  const text = `"${q.text}" — ${q.ref}`;
+  if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => showToast('Verse copied ✓'));
+  else showToast('Copied: ' + q.ref);
+}
+function shareQotdToFriend() {
+  const q = QOTD_POOL[state.qotdIndex];
+  openShareModal(q.ref, q.text);
+}
+
+// ══════════════════════════════════════════
+//  PUBLIC COMMENTS (shared storage)
+// ══════════════════════════════════════════
+
+async function loadComments(qotdIdx) {
+  const key = `comments:qotd:${qotdIdx}`;
+  const raw = await storageGet(key, true);
+  const comments = raw ? JSON.parse(raw) : [];
+  renderComments(comments);
+}
+
+async function postComment() {
+  const nameEl = document.getElementById('comment-name');
+  const textEl = document.getElementById('comment-text');
+  const name = nameEl.value.trim() || 'Anonymous';
+  const text = textEl.value.trim();
+  if (!text) { showToast('Please write a reflection first'); return; }
+
+  const key = `comments:qotd:${state.qotdIndex}`;
+  const raw = await storageGet(key, true);
+  const comments = raw ? JSON.parse(raw) : [];
+
+  comments.push({ name, text, time: Date.now(), id: Math.random().toString(36).slice(2) });
+  // Keep latest 50 comments
+  const trimmed = comments.slice(-50);
+  await storageSet(key, JSON.stringify(trimmed), true);
+
+  textEl.value = '';
+  renderComments(trimmed);
+  showToast('Reflection posted ✦');
+}
+
+function renderComments(comments) {
+  const list = document.getElementById('comments-list');
+  if (!comments.length) {
+    list.innerHTML = '<span class="no-comments">Be the first to share a reflection…</span>';
+    return;
+  }
+  list.innerHTML = [...comments].reverse().map(c => `
+    <div class="comment-item">
+      <div class="comment-avatar">${escapeHtml(c.name.slice(0,2).toUpperCase())}</div>
+      <div class="comment-body">
+        <div class="comment-author">${escapeHtml(c.name)}</div>
+        <div class="comment-text-display">${escapeHtml(c.text)}</div>
+        <div class="comment-time">${timeAgo(c.time)}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function timeAgo(ts) {
+  const diff = Date.now() - ts;
+  if (diff < 60000) return 'just now';
+  if (diff < 3600000) return Math.floor(diff/60000) + 'm ago';
+  if (diff < 86400000) return Math.floor(diff/3600000) + 'h ago';
+  return Math.floor(diff/86400000) + 'd ago';
+}
+
+// ══════════════════════════════════════════
+//  MESSAGES / FRIENDS
+// ══════════════════════════════════════════
+
+function getFriends() {
+  return JSON.parse(localStorage.getItem('scriptura_friends') || '[]');
+}
+function saveFriends(friends) {
+  localStorage.setItem('scriptura_friends', JSON.stringify(friends));
+}
+
+async function renderMessagesPage() {
+  const uid = getMyUserId();
+  document.getElementById('my-code-display').textContent = uid;
+
+  // Register this user in shared storage so others can find them
+  await storageSet(`user:${uid}`, JSON.stringify({ uid, name: getMyDisplayName(), ts: Date.now() }), true);
+
+  renderFriendsList();
+}
+
+function renderFriendsList() {
+  const friends = getFriends();
+  const list = document.getElementById('friends-list');
+  if (!friends.length) {
+    list.innerHTML = '<div class="no-friends-msg">Add a friend using their 10-digit code to start sharing verses.</div>';
+    return;
+  }
+  list.innerHTML = friends.map(f => `
+    <div class="friend-item ${state.currentFriend === f.uid ? 'active' : ''}" onclick="selectFriend('${f.uid}', '${escapeAttr(f.name)}')">
+      <div class="friend-avatar">${escapeHtml(f.name.slice(0,2).toUpperCase())}</div>
+      <span class="friend-name">${escapeHtml(f.name)}</span>
+      <button class="remove-friend-btn" onclick="event.stopPropagation(); removeFriend('${f.uid}')" title="Remove">✕</button>
+    </div>
+  `).join('');
+}
+
+async function addFriend() {
+  const input = document.getElementById('add-friend-input');
+  const val = input.value.trim().toUpperCase();
+  if (!val) return;
+
+  const myUid = getMyUserId();
+  if (val === myUid) { showToast("That's your own code!"); return; }
+
+  const friends = getFriends();
+  if (friends.find(f => f.uid === val)) { showToast('Already in your friends list'); input.value=''; return; }
+
+  // Look up user in shared storage
+  const raw = await storageGet(`user:${val}`, true);
+  let friendName = val; // fallback to code as name
+  if (raw) {
+    const u = JSON.parse(raw);
+    friendName = u.name || val;
+  }
+
+  friends.push({ uid: val, name: friendName === 'Anonymous' ? val : friendName });
+  saveFriends(friends);
+  input.value = '';
+  renderFriendsList();
+  showToast(`${friendName} added as a friend ✦`);
+}
+
+function removeFriend(uid) {
+  const friends = getFriends().filter(f => f.uid !== uid);
+  saveFriends(friends);
+  if (state.currentFriend === uid) {
+    state.currentFriend = null;
+    document.getElementById('chat-no-friend').style.display = 'flex';
+    document.getElementById('chat-active').style.display = 'none';
+  }
+  renderFriendsList();
+  showToast('Friend removed');
+}
+
+async function selectFriend(uid, name) {
+  state.currentFriend = uid;
+  renderFriendsList();
+
+  document.getElementById('chat-no-friend').style.display = 'none';
+  const chatActive = document.getElementById('chat-active');
+  chatActive.style.display = 'flex';
+  document.getElementById('chat-header-name').textContent = name;
+  document.getElementById('chat-avatar').textContent = name.slice(0,2).toUpperCase();
+
+  await loadChat(uid);
+}
+
+function getChatKey(uid1, uid2) {
+  // deterministic key regardless of who initiated
+  return 'chat:' + [uid1, uid2].sort().join(':');
+}
+
+async function loadChat(friendUid) {
+  const myUid = getMyUserId();
+  const key = getChatKey(myUid, friendUid);
+  const raw = await storageGet(key, true);
+  const messages = raw ? JSON.parse(raw) : [];
+  renderChat(messages, myUid);
+}
+
+function renderChat(messages, myUid) {
+  const container = document.getElementById('chat-messages');
+  if (!messages.length) {
+    container.innerHTML = '<div class="chat-empty">No messages yet. Share a verse to begin the conversation.</div>';
+    return;
+  }
+  container.innerHTML = messages.map(m => {
+    const isMine = m.from === myUid;
+    const reactions = m.reactions || {};
+    const reactionHtml = Object.entries(reactions).filter(([,c]) => c > 0).map(([emoji, count]) =>
+      `<span class="reaction-pill" onclick="addReaction('${m.id}','${emoji}')">${emoji} <span class="r-count">${count}</span></span>`
+    ).join('') + `<button class="add-reaction-btn" onclick="toggleEmojiPicker('${m.id}')">+ react</button>
+    <div class="emoji-picker" id="ep-${m.id}" style="display:none;position:absolute;${isMine?'right:0':'left:0'};bottom:2rem;z-index:50">
+      ${['🙏','❤️','✨','🕊️','😭','🔥','💛','👑','🌿','✝️'].map(e => `<span class="emoji-opt" onclick="addReaction('${m.id}','${e}');toggleEmojiPicker('${m.id}')">${e}</span>`).join('')}
+    </div>`;
+    return `<div class="msg-bubble ${isMine?'mine':'theirs'}">
+      ${!isMine ? `<div class="msg-sender">${escapeHtml(m.fromName||'Friend')}</div>` : ''}
+      <div class="msg-quote-box">
+        <div class="msg-quote-text">"${escapeHtml(m.text)}"</div>
+        <div class="msg-quote-ref">— ${escapeHtml(m.ref)}</div>
+      </div>
+      <div class="msg-time">${timeAgo(m.ts)}</div>
+      <div class="msg-reactions" style="position:relative">${reactionHtml}</div>
+    </div>`;
+  }).join('');
+  container.scrollTop = container.scrollHeight;
+}
+
+async function addReaction(msgId, emoji) {
+  if (!state.currentFriend) return;
+  const myUid = getMyUserId();
+  const key = getChatKey(myUid, state.currentFriend);
+  const raw = await storageGet(key, true);
+  const messages = raw ? JSON.parse(raw) : [];
+  const msg = messages.find(m => m.id === msgId);
+  if (!msg) return;
+  if (!msg.reactions) msg.reactions = {};
+  msg.reactions[emoji] = (msg.reactions[emoji] || 0) + 1;
+  await storageSet(key, JSON.stringify(messages), true);
+  renderChat(messages, myUid);
+}
+
+function toggleEmojiPicker(msgId) {
+  const picker = document.getElementById(`ep-${msgId}`);
+  if (!picker) return;
+  const showing = picker.style.display !== 'none';
+  document.querySelectorAll('.emoji-picker').forEach(p => p.style.display = 'none');
+  if (!showing) picker.style.display = 'flex';
+}
+
+// ══════════════════════════════════════════
+//  SHARE VERSE MODAL
+// ══════════════════════════════════════════
+
+function openShareModal(ref, text) {
+  const friends = getFriends();
+  state.shareVerseData = { ref, text };
+  document.getElementById('share-preview-verse').textContent = `"${text}"`;
+  document.getElementById('share-preview-ref').textContent = `— ${ref}`;
+
+  const list = document.getElementById('share-friends-list');
+  if (!friends.length) {
+    list.innerHTML = '<div class="no-friends-note">You have no friends yet. Add one from the Messages page using their 10-digit code.</div>';
+  } else {
+    list.innerHTML = friends.map(f => `
+      <label class="friend-check" onclick="this.classList.toggle('selected')">
+        <input type="checkbox" value="${f.uid}" class="share-recipient">
+        <span class="friend-check-name">${escapeHtml(f.name)}</span>
+      </label>
+    `).join('');
+  }
+  document.getElementById('share-modal').classList.remove('hidden');
+}
+
+function closeShareModal() {
+  document.getElementById('share-modal').classList.add('hidden');
+  state.shareVerseData = null;
+}
+
+async function sendVerseToFriends() {
+  if (!state.shareVerseData) return;
+  const selected = [...document.querySelectorAll('.share-recipient:checked')].map(el => el.value);
+  if (!selected.length) { showToast('Select at least one friend'); return; }
+
+  const myUid = getMyUserId();
+  const { ref, text } = state.shareVerseData;
+  const msgId = Date.now().toString(36) + Math.random().toString(36).slice(2);
+  const msg = { id: msgId, from: myUid, fromName: getMyDisplayName(), ref, text, ts: Date.now(), reactions: {} };
+
+  for (const friendUid of selected) {
+    const key = getChatKey(myUid, friendUid);
+    const raw = await storageGet(key, true);
+    const messages = raw ? JSON.parse(raw) : [];
+    messages.push(msg);
+    await storageSet(key, JSON.stringify(messages.slice(-200)), true);
+  }
+
+  closeShareModal();
+  showToast(`Verse sent to ${selected.length} friend${selected.length>1?'s':''} ✉`);
+  if (state.currentFriend && selected.includes(state.currentFriend)) {
+    await loadChat(state.currentFriend);
+  }
+}
+
+function copyMyCode() {
+  const code = getMyUserId();
+  if (navigator.clipboard) navigator.clipboard.writeText(code).then(() => showToast('Code copied: ' + code));
+  else showToast('Your code: ' + code);
+}
+
+// ══════════════════════════════════════════
+//  HERO SEARCH
+// ══════════════════════════════════════════
+
+function heroSearch() {
+  const q = document.getElementById('hero-search').value.trim();
+  if (!q) return;
+  // Check if it looks like a reference (contains digits)
+  if (/\d/.test(q)) {
+    document.getElementById('passage-input').value = q;
+    showPage('bible');
+    setTimeout(() => searchPassage(), 100);
+  } else {
+    document.getElementById('keyword-input').value = q;
+    showPage('search');
+    setTimeout(() => doKeywordSearch(), 100);
+  }
+}
+
+async function searchPassage() {
+  const q = document.getElementById('passage-input').value.trim();
+  if (!q) return;
+  const chapterMatch = q.match(/^(\d?\s?[a-zA-Z\s]+)\s+(\d+)$/);
+  if (chapterMatch && !q.includes(':')) {
+    const bookName = chapterMatch[1].trim();
+    const ch = parseInt(chapterMatch[2]);
+    const book = BOOKS.find(b => b.name.toLowerCase() === bookName.toLowerCase() || b.abbr.toLowerCase() === bookName.toLowerCase());
+    if (book) {
+      state.currentBook = book.abbr;
+      state.currentChapter = ch;
+      document.getElementById('book-select').value = book.abbr;
+      updateChapters(false);
+      document.getElementById('chapter-select').value = ch;
+      loadChapter();
+      return;
+    }
+  }
+  const content = document.getElementById('bible-content');
+  content.innerHTML = '<div class="loading">Searching the Scriptures</div>';
+  try {
+    const translation = document.getElementById('translation-select').value;
+    const data = await fetchVerse(q, translation);
+    const translLabel = translation === 'kjv' ? 'KJV' : 'WEB';
+    let html = `<div class="chapter-header"><div class="chapter-book">Search Results</div><h2 class="chapter-title"><span>${escapeHtml(data.reference)}</span> <span class="translation-badge">${translLabel}</span></h2></div><div class="verse-container">`;
+    const verses = data.verses || [];
+    verses.forEach(v => {
+      const ref = `${data.reference.split(':')[0].trim()}:${v.verse}`;
+      const text = v.text.trim().replace(/\n/g,' ');
+      const isSaved = state.saved.some(s => s.ref === ref);
+      const isLiked = state.liked.some(l => l.ref === ref);
+      html += `<div class="verse"><span class="verse-num">${v.verse}</span><span class="verse-text">${escapeHtml(text)}</span>
+        <div class="verse-actions">
+          <button class="verse-btn ${isSaved?'saved':''}" onclick="toggleSave('${escapeAttr(ref)}','${escapeAttr(text)}')">☆</button>
+          <button class="verse-btn ${isLiked?'liked':''}" onclick="toggleLike('${escapeAttr(ref)}','${escapeAttr(text)}')">♡</button>
+          <button class="verse-btn msg-btn" onclick="openShareModal('${escapeAttr(ref)}','${escapeAttr(text)}')">✉</button>
+        </div></div>`;
+    });
+    html += '</div>';
+    content.innerHTML = html;
+  } catch(e) {
+    content.innerHTML = `<div class="loading">No results for "${escapeHtml(q)}". Try a reference like "John 3:16"</div>`;
+  }
+}
+
+// ══════════════════════════════════════════
+//  SAVED / LIKED PAGE RENDERERS
+// ══════════════════════════════════════════
+
+function renderSavedPage() {
+  const list = document.getElementById('saved-list');
+  const count = document.getElementById('saved-count');
+  count.textContent = `${state.saved.length} verse${state.saved.length!==1?'s':''}`;
+  if (!state.saved.length) { list.innerHTML = `<div class="empty-state"><div class="empty-state-icon">☆</div><div class="empty-state-text">No saved verses yet</div><div class="empty-state-sub">Press the ☆ button on any verse to save it here.</div></div>`; return; }
+  list.innerHTML = [...state.saved].reverse().map((v,i) => `
+    <div class="quote-card">
+      <div class="quote-card-actions">
+        <button class="icon-btn" onclick="openShareModal('${escapeAttr(v.ref)}','${escapeAttr(v.text)}')" title="Send">✉</button>
+        <button class="icon-btn" onclick="removeSaved(${state.saved.length-1-i})" title="Remove">✕</button>
+      </div>
+      <p class="quote-card-text">"${escapeHtml(v.text)}"</p>
+      <div class="quote-card-ref">— ${escapeHtml(v.ref)}</div>
+    </div>
+  `).join('');
+}
+
+function renderLikedPage() {
+  const list = document.getElementById('liked-list');
+  const count = document.getElementById('liked-count');
+  count.textContent = `${state.liked.length} verse${state.liked.length!==1?'s':''}`;
+  if (!state.liked.length) { list.innerHTML = `<div class="empty-state"><div class="empty-state-icon">♡</div><div class="empty-state-text">No liked verses yet</div><div class="empty-state-sub">Press the ♡ button on any verse to like it.</div></div>`; return; }
+  list.innerHTML = [...state.liked].reverse().map((v,i) => `
+    <div class="quote-card">
+      <div class="quote-card-actions">
+        <button class="icon-btn" onclick="openShareModal('${escapeAttr(v.ref)}','${escapeAttr(v.text)}')" title="Send">✉</button>
+        <button class="icon-btn" onclick="removeLiked(${state.liked.length-1-i})" title="Remove">✕</button>
+      </div>
+      <p class="quote-card-text">"${escapeHtml(v.text)}"</p>
+      <div class="quote-card-ref">— ${escapeHtml(v.ref)}</div>
+    </div>
+  `).join('');
+}
+
+function removeSaved(idx) { state.saved.splice(idx,1); saveState(); renderSavedPage(); showToast('Removed'); }
+function removeLiked(idx) { state.liked.splice(idx,1); saveState(); renderLikedPage(); showToast('Removed'); }
+
+// ══════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════
+
+function escapeHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escapeAttr(str) {
+  return String(str).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"').replace(/\n/g,' ');
+}
+
+let toastTimeout;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+// Close modal on overlay click
+document.getElementById('share-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeShareModal();
+});
+
+// Close emoji pickers on outside click
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.emoji-picker') && !e.target.closest('.add-reaction-btn')) {
+    document.querySelectorAll('.emoji-picker').forEach(p => p.style.display = 'none');
+  }
+});
+
+// ══════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', () => {
+  setupSelectors();
+  loadQotd();
+  getMyUserId(); // ensure uid is generated
+});
+</script>
+</body>
+</html>
