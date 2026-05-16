@@ -1,1330 +1,1031 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Scriptura — The Living Word</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --parchment: #f8f3e8;
-    --parchment-dark: #ede5d0;
-    --ink: #2c2418;
-    --ink-light: #5c4f3a;
-    --ink-faint: #9e8e72;
-    --gold: #b8862a;
-    --gold-light: #d4a843;
-    --gold-pale: #f0dfa0;
-    --crimson: #8b2635;
-    --crimson-light: #c04050;
-    --sage: #4a6741;
-    --cream: #fdf9f0;
-    --border: #d4c4a0;
-    --shadow: rgba(44, 36, 24, 0.12);
-    --blue: #1e4d8c;
-    --blue-light: #3a6db5;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    background-color: var(--parchment);
-    color: var(--ink);
-    font-family: 'Crimson Pro', Georgia, serif;
-    font-size: 18px;
-    min-height: 100vh;
-    background-image:
-      radial-gradient(ellipse at 20% 10%, rgba(184,134,42,0.06) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 90%, rgba(139,38,53,0.05) 0%, transparent 50%);
-  }
-  header {
-    background: var(--ink);
-    color: var(--parchment);
-    padding: 0;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 20px rgba(0,0,0,0.3);
-  }
-  .header-inner {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 2rem;
-    height: 64px;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-  .logo { display: flex; align-items: baseline; gap: 0.5rem; text-decoration: none; }
-  .logo-word { font-family: 'IM Fell English', Georgia, serif; font-size: 1.7rem; color: var(--gold-light); letter-spacing: 0.02em; }
-  .logo-sub { font-family: 'Crimson Pro', serif; font-size: 0.75rem; color: var(--ink-faint); letter-spacing: 0.15em; text-transform: uppercase; font-style: italic; }
-  nav { display: flex; gap: 0.25rem; align-items: center; flex-wrap: wrap; }
-  nav button {
-    background: none; border: none; color: var(--parchment-dark);
-    font-family: 'Crimson Pro', serif; font-size: 0.9rem; letter-spacing: 0.06em;
-    text-transform: uppercase; padding: 0.5rem 0.85rem; cursor: pointer;
-    border-radius: 4px; transition: all 0.2s; position: relative;
-  }
-  nav button:hover, nav button.active { color: var(--gold-light); background: rgba(255,255,255,0.06); }
-  nav button.active::after {
-    content: ''; position: absolute; bottom: -2px; left: 1rem; right: 1rem;
-    height: 2px; background: var(--gold-light); border-radius: 1px;
-  }
-  main { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-  .page { display: none; }
-  .page.active { display: block; animation: fadeIn 0.35s ease; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumina | Minimalist Study Bible</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; transition: background-color 0.3s, color 0.3s; }
+        .reading-font { font-family: 'Merriweather', serif; line-height: 2; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        body.dark ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
 
-  /* ── HOME ── */
-  .home-hero { text-align: center; padding: 3rem 0 2rem; }
-  .home-hero::before { content: '✦'; display: block; font-size: 1.2rem; color: var(--gold); margin-bottom: 1rem; opacity: 0.6; }
-  .home-title { font-family: 'Playfair Display', Georgia, serif; font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 400; color: var(--ink); line-height: 1.2; margin-bottom: 0.5rem; }
-  .home-subtitle { font-family: 'Crimson Pro', serif; font-style: italic; color: var(--ink-faint); font-size: 1.1rem; margin-bottom: 2.5rem; }
-  .search-bar {
-    display: flex; max-width: 620px; margin: 0 auto 3rem;
-    background: white; border: 1.5px solid var(--border);
-    border-radius: 50px; overflow: hidden; box-shadow: 0 4px 20px var(--shadow); transition: box-shadow 0.2s;
-  }
-  .search-bar:focus-within { box-shadow: 0 6px 30px rgba(184,134,42,0.2); border-color: var(--gold); }
-  .search-bar input { flex: 1; border: none; outline: none; padding: 0.9rem 1.5rem; font-family: 'Crimson Pro', serif; font-size: 1.05rem; color: var(--ink); background: transparent; }
-  .search-bar input::placeholder { color: var(--ink-faint); font-style: italic; }
-  .search-bar button { background: var(--ink); color: var(--gold-light); border: none; padding: 0 1.6rem; font-family: 'Crimson Pro', serif; font-size: 0.9rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: background 0.2s; }
-  .search-bar button:hover { background: var(--crimson); }
-  .qotd-card {
-    background: var(--ink); color: var(--parchment); border-radius: 16px;
-    padding: 2.5rem 3rem; position: relative; overflow: hidden; margin-bottom: 1.5rem;
-    box-shadow: 0 8px 40px rgba(44,36,24,0.2);
-  }
-  .qotd-card::before {
-    content: '\201C'; font-family: 'Playfair Display', serif; font-size: 14rem;
-    color: rgba(184,134,42,0.12); position: absolute; top: -2rem; left: 1rem;
-    line-height: 1; pointer-events: none;
-  }
-  .qotd-label { font-family: 'Crimson Pro', serif; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-light); margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.6rem; }
-  .qotd-label::before, .qotd-label::after { content: ''; flex: 1; max-width: 40px; height: 1px; background: var(--gold); opacity: 0.4; }
-  .qotd-verse { font-family: 'Playfair Display', Georgia, serif; font-size: clamp(1.2rem, 3vw, 1.7rem); font-style: italic; font-weight: 400; line-height: 1.55; color: var(--parchment); margin-bottom: 1rem; position: relative; z-index: 1; }
-  .qotd-ref { font-family: 'Crimson Pro', serif; font-size: 0.95rem; color: var(--gold-light); font-style: normal; letter-spacing: 0.04em; }
-  .qotd-actions { margin-top: 1.5rem; display: flex; gap: 0.75rem; flex-wrap: wrap; }
-  .btn-ghost { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: var(--parchment-dark); padding: 0.5rem 1.2rem; border-radius: 50px; font-family: 'Crimson Pro', serif; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; letter-spacing: 0.04em; }
-  .btn-ghost:hover { background: rgba(184,134,42,0.2); border-color: var(--gold); color: var(--gold-light); }
-  .btn-ghost.liked { background: rgba(139,38,53,0.25); border-color: var(--crimson-light); color: #ff8a97; }
-  .btn-ghost.active-msg { background: rgba(30,77,140,0.3); border-color: #3a6db5; color: #90b8f0; }
+        /* Theme parameters */
+        body.light { background-color: #FAF9F6; color: #171717; }
+        body.dark { background-color: #121212; color: #e5e5e5; }
+        
+        .glass-nav { backdrop-filter: blur(12px); }
+        body.light .glass-nav { background-color: rgba(250, 249, 246, 0.95); border-bottom: 1px solid #e5e7eb; border-top: 1px solid #e5e7eb; }
+        body.dark .glass-nav { background-color: rgba(18, 18, 18, 0.95); border-bottom: 1px solid #2d2d2d; border-top: 1px solid #2d2d2d; }
 
-  /* ── PUBLIC COMMENTS ── */
-  .comments-section {
-    background: rgba(255,255,255,0.06); border-top: 1px solid rgba(184,134,42,0.2);
-    margin-top: 1.5rem; padding-top: 1.5rem; position: relative; z-index: 1;
-  }
-  .comments-title { font-family: 'Crimson Pro', serif; font-size: 0.75rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold-light); margin-bottom: 1rem; }
-  .comment-input-row { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
-  .comment-name-input, .comment-text-input {
-    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 8px; padding: 0.5rem 0.8rem; font-family: 'Crimson Pro', serif;
-    font-size: 0.95rem; color: var(--parchment); outline: none; transition: border-color 0.2s;
-  }
-  .comment-name-input { width: 130px; flex-shrink: 0; }
-  .comment-text-input { flex: 1; }
-  .comment-name-input::placeholder, .comment-text-input::placeholder { color: rgba(158,142,114,0.7); font-style: italic; }
-  .comment-name-input:focus, .comment-text-input:focus { border-color: var(--gold); }
-  .btn-comment { background: rgba(184,134,42,0.25); border: 1px solid var(--gold); color: var(--gold-light); padding: 0.5rem 1rem; border-radius: 8px; font-family: 'Crimson Pro', serif; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
-  .btn-comment:hover { background: rgba(184,134,42,0.4); }
-  .comments-list { display: flex; flex-direction: column; gap: 0.6rem; max-height: 220px; overflow-y: auto; }
-  .comment-item { display: flex; gap: 0.6rem; align-items: flex-start; }
-  .comment-avatar { width: 28px; height: 28px; border-radius: 50%; background: rgba(184,134,42,0.25); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: var(--gold-light); flex-shrink: 0; font-family: 'Crimson Pro', serif; font-weight: 600; }
-  .comment-body { flex: 1; }
-  .comment-author { font-size: 0.75rem; color: var(--gold-light); letter-spacing: 0.04em; margin-bottom: 0.15rem; }
-  .comment-text-display { font-size: 0.9rem; color: rgba(248,243,232,0.85); font-family: 'Crimson Pro', serif; line-height: 1.4; }
-  .comment-time { font-size: 0.72rem; color: rgba(158,142,114,0.7); margin-top: 0.1rem; }
-  .no-comments { font-style: italic; color: rgba(158,142,114,0.6); font-size: 0.9rem; font-family: 'Crimson Pro', serif; }
+        /* Global Theme Color Balancing Rules */
+        body.light .logo-text, body.light .section-heading, body.light .ui-text-main { color: #171717; }
+        body.dark .logo-text, body.dark .section-heading, body.dark .ui-text-main { color: #ffffff; }
+        body.light .nav-icon, body.light .ui-text-sub { color: #262626; }
+        body.dark .nav-icon, body.dark .ui-text-sub { color: #e5e5e5; }
 
-  /* ── HOME GRID ── */
-  .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; }
-  @media (max-width: 700px) { .home-grid { grid-template-columns: 1fr; } }
-  .mini-card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px var(--shadow); }
-  .mini-card:hover { box-shadow: 0 6px 24px var(--shadow); transform: translateY(-2px); border-color: var(--gold); }
-  .mini-card-title { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 500; color: var(--ink); margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.5rem; }
-  .mini-card-icon { font-size: 1.1rem; }
-  .mini-card-text { font-family: 'Crimson Pro', serif; font-size: 0.9rem; color: var(--ink-faint); font-style: italic; line-height: 1.5; }
+        /* Strict Scripture Layout Color Settings */
+        body.light .main-bible-text { color: #171717; }
+        body.dark .main-bible-text { color: #e5e5e5; }
+        body.light .parallel-bible-text { color: #525252; }
+        body.dark .parallel-bible-text { color: #a3a3a3; }
 
-  /* ── BIBLE READER ── */
-  .bible-controls { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px var(--shadow); }
-  .selectors-row { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: flex-end; margin-bottom: 1rem; }
-  .selector-group { display: flex; flex-direction: column; gap: 0.3rem; flex: 1; min-width: 140px; }
-  .selector-group label { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-faint); font-family: 'Crimson Pro', serif; }
-  select { background: var(--cream); border: 1.5px solid var(--border); border-radius: 8px; padding: 0.6rem 0.9rem; font-family: 'Crimson Pro', serif; font-size: 1rem; color: var(--ink); cursor: pointer; outline: none; transition: border-color 0.2s; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239e8e72' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.8rem center; padding-right: 2rem; }
-  select:focus { border-color: var(--gold); }
-  .btn-primary { background: var(--ink); color: var(--gold-light); border: none; padding: 0.65rem 1.8rem; border-radius: 8px; font-family: 'Crimson Pro', serif; font-size: 1rem; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; align-self: flex-end; }
-  .btn-primary:hover { background: var(--crimson); }
-  .passage-search { display: flex; gap: 0.75rem; }
-  .passage-search input { flex: 1; background: var(--cream); border: 1.5px solid var(--border); border-radius: 8px; padding: 0.6rem 0.9rem; font-family: 'Crimson Pro', serif; font-size: 1rem; color: var(--ink); outline: none; transition: border-color 0.2s; }
-  .passage-search input::placeholder { color: var(--ink-faint); font-style: italic; }
-  .passage-search input:focus { border-color: var(--gold); }
-  .bible-content { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 2.5rem 3rem; box-shadow: 0 2px 8px var(--shadow); min-height: 400px; }
-  @media (max-width: 600px) { .bible-content { padding: 1.5rem; } }
-  .chapter-header { text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
-  .chapter-book { font-family: 'IM Fell English', Georgia, serif; font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.3rem; }
-  .chapter-title { font-family: 'Playfair Display', Georgia, serif; font-size: clamp(1.5rem, 4vw, 2.2rem); font-weight: 400; color: var(--ink); }
-  .chapter-title span { font-style: italic; color: var(--ink-light); }
-  .verse-container { display: flex; flex-direction: column; }
-  .verse { display: flex; gap: 0.75rem; padding: 0.5rem 0.5rem; border-radius: 6px; transition: background 0.15s; cursor: default; line-height: 1.7; align-items: flex-start; }
-  .verse:hover { background: var(--parchment); }
-  .verse-num { font-family: 'Crimson Pro', serif; font-size: 0.7rem; font-weight: 600; color: var(--gold); min-width: 1.6rem; padding-top: 0.25rem; text-align: right; letter-spacing: 0.03em; flex-shrink: 0; }
-  .verse-text { font-family: 'Crimson Pro', serif; font-size: 1.1rem; color: var(--ink); line-height: 1.75; flex: 1; }
-  .verse-actions { display: flex; gap: 0.3rem; opacity: 0; transition: opacity 0.15s; flex-shrink: 0; padding-top: 0.2rem; }
-  .verse:hover .verse-actions { opacity: 1; }
-  .verse-btn { background: none; border: 1px solid var(--border); border-radius: 4px; padding: 0.15rem 0.4rem; font-size: 0.75rem; cursor: pointer; color: var(--ink-faint); transition: all 0.15s; font-family: 'Crimson Pro', serif; }
-  .verse-btn:hover { background: var(--parchment-dark); color: var(--ink); border-color: var(--ink-faint); }
-  .verse-btn.saved { color: var(--gold); border-color: var(--gold); background: rgba(184,134,42,0.08); }
-  .verse-btn.liked { color: var(--crimson); border-color: var(--crimson); background: rgba(139,38,53,0.08); }
-  .verse-btn.msg-btn { color: var(--blue-light); border-color: var(--blue-light); }
-  .verse-btn.msg-btn:hover { background: rgba(30,77,140,0.08); }
-  .chapter-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
-  .chapter-nav button { background: none; border: 1.5px solid var(--border); color: var(--ink-light); padding: 0.6rem 1.4rem; border-radius: 8px; font-family: 'Crimson Pro', serif; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; letter-spacing: 0.04em; }
-  .chapter-nav button:hover { background: var(--ink); color: var(--gold-light); border-color: var(--ink); }
-  .chapter-nav-center { font-family: 'Crimson Pro', serif; font-size: 0.85rem; color: var(--ink-faint); font-style: italic; }
+        .verse-num { font-size: 0.75em; vertical-align: super; font-weight: 600; margin-right: 4px; font-family: 'Inter', sans-serif;}
+        body.light .verse-num { color: #4f46e5; }
+        body.dark .verse-num { color: #a78bfa; }
+        
+        .verse-span { position: relative; cursor: pointer; border-radius: 2px; padding: 2px 4px; transition: all 0.2s; }
+        
+        /* Audio Narrator Active Focus Glow */
+        .verse-span.audio-active {
+            background-color: rgba(99, 102, 241, 0.15);
+            border-radius: 4px;
+            box-shadow: 0 0 8px rgba(99, 102, 241, 0.2);
+        }
 
-  /* ── KEYWORD SEARCH PAGE ── */
-  .keyword-search-bar { display: flex; gap: 0.75rem; margin-bottom: 1.5rem; }
-  .keyword-search-bar input { flex: 1; background: white; border: 1.5px solid var(--border); border-radius: 8px; padding: 0.75rem 1.2rem; font-family: 'Crimson Pro', serif; font-size: 1.05rem; color: var(--ink); outline: none; transition: border-color 0.2s; box-shadow: 0 2px 8px var(--shadow); }
-  .keyword-search-bar input::placeholder { color: var(--ink-faint); font-style: italic; }
-  .keyword-search-bar input:focus { border-color: var(--gold); }
-  .keyword-search-bar select { background: white; border: 1.5px solid var(--border); border-radius: 8px; padding: 0.75rem 2.2rem 0.75rem 0.9rem; font-family: 'Crimson Pro', serif; font-size: 0.95rem; color: var(--ink); outline: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239e8e72' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.8rem center; appearance: none; }
-  .search-results-meta { font-family: 'Crimson Pro', serif; font-size: 0.9rem; color: var(--ink-faint); font-style: italic; margin-bottom: 1.2rem; }
-  .search-result-card { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem 1.5rem; margin-bottom: 0.85rem; box-shadow: 0 2px 8px var(--shadow); transition: all 0.2s; cursor: pointer; }
-  .search-result-card:hover { box-shadow: 0 6px 20px var(--shadow); border-color: var(--gold); transform: translateY(-1px); }
-  .search-result-ref { font-family: 'IM Fell English', Georgia, serif; font-size: 0.8rem; letter-spacing: 0.15em; color: var(--gold); margin-bottom: 0.4rem; text-transform: uppercase; }
-  .search-result-text { font-family: 'Crimson Pro', serif; font-size: 1.05rem; color: var(--ink); line-height: 1.65; }
-  .search-result-text mark { background: rgba(184,134,42,0.18); color: var(--crimson); border-radius: 2px; padding: 0 2px; font-weight: 600; }
-  .search-result-actions { display: flex; gap: 0.4rem; margin-top: 0.75rem; }
+        .hl-yellow { background-color: rgba(253, 224, 71, 0.4); }
+        .hl-green  { background-color: rgba(134, 239, 172, 0.4); }
+        .hl-blue   { background-color: rgba(147, 197, 253, 0.4); }
+        body.dark .hl-yellow { background-color: rgba(253, 224, 71, 0.2); }
+        body.dark .hl-green  { background-color: rgba(134, 239, 172, 0.2); }
+        body.dark .hl-blue   { background-color: rgba(147, 197, 253, 0.2); }
 
-  /* ── SAVED / LIKED ── */
-  .section-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
-  .section-title { font-family: 'Playfair Display', Georgia, serif; font-size: 1.8rem; font-weight: 400; color: var(--ink); }
-  .section-count { font-family: 'Crimson Pro', serif; font-size: 0.85rem; color: var(--ink-faint); font-style: italic; }
-  .quote-card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 2rem; margin-bottom: 1rem; position: relative; box-shadow: 0 2px 8px var(--shadow); transition: all 0.2s; }
-  .quote-card:hover { box-shadow: 0 6px 20px var(--shadow); transform: translateY(-1px); }
-  .quote-card-text { font-family: 'Playfair Display', Georgia, serif; font-size: 1.1rem; font-style: italic; color: var(--ink); line-height: 1.65; margin-bottom: 0.75rem; }
-  .quote-card-ref { font-family: 'Crimson Pro', serif; font-size: 0.85rem; color: var(--gold); letter-spacing: 0.04em; }
-  .quote-card-actions { position: absolute; top: 1rem; right: 1rem; display: flex; gap: 0.4rem; }
-  .icon-btn { background: none; border: none; cursor: pointer; font-size: 1rem; padding: 0.3rem; border-radius: 4px; transition: all 0.15s; color: var(--ink-faint); }
-  .icon-btn:hover { color: var(--crimson); background: rgba(139,38,53,0.08); }
-  .empty-state { text-align: center; padding: 4rem 2rem; color: var(--ink-faint); }
-  .empty-state-icon { font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.4; }
-  .empty-state-text { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.1rem; }
-  .empty-state-sub { font-family: 'Crimson Pro', serif; font-size: 0.9rem; margin-top: 0.5rem; }
-  .loading { text-align: center; padding: 3rem; color: var(--ink-faint); font-family: 'Crimson Pro', serif; font-style: italic; font-size: 1.1rem; }
-  .loading::after { content: '...'; animation: dots 1.5s steps(3, end) infinite; }
-  @keyframes dots { 0%,33%{content:'.'} 34%,66%{content:'..'} 67%,100%{content:'...'} }
-
-  /* ── MESSAGES / FRIENDS PAGE ── */
-  .msg-layout { display: grid; grid-template-columns: 280px 1fr; gap: 1.5rem; min-height: 560px; }
-  @media (max-width: 750px) { .msg-layout { grid-template-columns: 1fr; } }
-  .friends-panel { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 0; box-shadow: 0 2px 8px var(--shadow); display: flex; flex-direction: column; overflow: hidden; }
-  .friends-panel-header { padding: 1.2rem 1.3rem; border-bottom: 1px solid var(--border); background: var(--parchment-dark); }
-  .friends-panel-title { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 500; color: var(--ink); margin-bottom: 0.6rem; }
-  .my-code { display: flex; align-items: center; gap: 0.5rem; background: var(--parchment); border: 1px solid var(--border); border-radius: 6px; padding: 0.4rem 0.7rem; }
-  .my-code-label { font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); font-family: 'Crimson Pro', serif; }
-  .my-code-val { font-family: 'IM Fell English', Georgia, serif; font-size: 1rem; color: var(--ink); letter-spacing: 0.06em; flex: 1; }
-  .copy-code-btn { background: none; border: none; cursor: pointer; font-size: 0.8rem; color: var(--ink-faint); padding: 0.1rem 0.3rem; border-radius: 3px; transition: all 0.15s; }
-  .copy-code-btn:hover { color: var(--gold); background: rgba(184,134,42,0.1); }
-  .add-friend-row { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
-  .add-friend-input { flex: 1; background: white; border: 1px solid var(--border); border-radius: 6px; padding: 0.4rem 0.6rem; font-family: 'Crimson Pro', serif; font-size: 0.9rem; color: var(--ink); outline: none; min-width: 0; }
-  .add-friend-input:focus { border-color: var(--gold); }
-  .add-friend-btn { background: var(--ink); color: var(--gold-light); border: none; padding: 0.4rem 0.8rem; border-radius: 6px; font-family: 'Crimson Pro', serif; font-size: 0.85rem; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
-  .add-friend-btn:hover { background: var(--crimson); }
-  .friends-list { flex: 1; overflow-y: auto; padding: 0.5rem; }
-  .friend-item { display: flex; align-items: center; gap: 0.7rem; padding: 0.7rem 0.8rem; border-radius: 8px; cursor: pointer; transition: background 0.15s; position: relative; }
-  .friend-item:hover { background: var(--parchment); }
-  .friend-item.active { background: var(--parchment-dark); }
-  .friend-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--parchment-dark); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: 'IM Fell English', serif; font-size: 0.95rem; color: var(--ink-light); flex-shrink: 0; }
-  .friend-name { font-family: 'Crimson Pro', serif; font-size: 1rem; color: var(--ink); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .friend-unread { background: var(--crimson); color: white; font-size: 0.65rem; font-weight: 700; min-width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Crimson Pro', serif; }
-  .remove-friend-btn { background: none; border: none; color: var(--ink-faint); cursor: pointer; font-size: 0.7rem; padding: 0.2rem; opacity: 0; transition: opacity 0.15s; }
-  .friend-item:hover .remove-friend-btn { opacity: 1; }
-  .chat-panel { background: white; border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 2px 8px var(--shadow); display: flex; flex-direction: column; overflow: hidden; min-height: 400px; }
-  .chat-header { padding: 1.1rem 1.4rem; border-bottom: 1px solid var(--border); background: var(--parchment-dark); display: flex; align-items: center; gap: 0.8rem; }
-  .chat-header-name { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 500; color: var(--ink); }
-  .chat-header-sub { font-family: 'Crimson Pro', serif; font-size: 0.8rem; color: var(--ink-faint); font-style: italic; }
-  .chat-messages { flex: 1; overflow-y: auto; padding: 1.2rem; display: flex; flex-direction: column; gap: 1rem; min-height: 300px; max-height: 420px; }
-  .chat-no-friend { flex: 1; display: flex; align-items: center; justify-content: center; text-align: center; color: var(--ink-faint); font-family: 'Crimson Pro', serif; font-style: italic; padding: 2rem; }
-  .msg-bubble { max-width: 85%; display: flex; flex-direction: column; gap: 0.3rem; }
-  .msg-bubble.mine { align-self: flex-end; align-items: flex-end; }
-  .msg-bubble.theirs { align-self: flex-start; align-items: flex-start; }
-  .msg-quote-box { border-radius: 10px; padding: 0.9rem 1.1rem; position: relative; }
-  .msg-bubble.mine .msg-quote-box { background: var(--ink); color: var(--parchment); border-bottom-right-radius: 2px; }
-  .msg-bubble.theirs .msg-quote-box { background: var(--parchment-dark); border: 1px solid var(--border); color: var(--ink); border-bottom-left-radius: 2px; }
-  .msg-quote-text { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 0.9rem; line-height: 1.5; margin-bottom: 0.4rem; }
-  .msg-bubble.mine .msg-quote-text { color: var(--parchment); }
-  .msg-bubble.theirs .msg-quote-text { color: var(--ink); }
-  .msg-quote-ref { font-family: 'Crimson Pro', serif; font-size: 0.75rem; color: var(--gold); }
-  .msg-time { font-size: 0.7rem; color: var(--ink-faint); font-family: 'Crimson Pro', serif; margin: 0 0.3rem; }
-  .msg-sender { font-size: 0.75rem; color: var(--ink-faint); font-family: 'Crimson Pro', serif; }
-  .msg-reactions { display: flex; gap: 0.3rem; flex-wrap: wrap; }
-  .reaction-pill { background: var(--parchment-dark); border: 1px solid var(--border); border-radius: 20px; padding: 0.15rem 0.5rem; font-size: 1rem; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 0.2rem; }
-  .reaction-pill:hover { border-color: var(--gold); background: rgba(184,134,42,0.08); }
-  .reaction-pill .r-count { font-size: 0.7rem; color: var(--ink-faint); font-family: 'Crimson Pro', serif; }
-  .add-reaction-btn { background: none; border: 1px dashed var(--border); border-radius: 20px; padding: 0.15rem 0.5rem; font-size: 0.75rem; cursor: pointer; color: var(--ink-faint); font-family: 'Crimson Pro', serif; transition: all 0.15s; }
-  .add-reaction-btn:hover { border-color: var(--gold); color: var(--gold); }
-  .emoji-picker { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 0.6rem; box-shadow: 0 4px 20px var(--shadow); display: flex; flex-wrap: wrap; gap: 0.4rem; max-width: 200px; z-index: 50; }
-  .emoji-opt { font-size: 1.1rem; cursor: pointer; padding: 0.2rem 0.3rem; border-radius: 4px; transition: background 0.1s; }
-  .emoji-opt:hover { background: var(--parchment-dark); }
-  .chat-empty { display: flex; flex: 1; align-items: center; justify-content: center; color: var(--ink-faint); font-family: 'Crimson Pro', serif; font-style: italic; font-size: 0.95rem; padding: 2rem; text-align: center; }
-  .no-friends-msg { padding: 2rem 1rem; text-align: center; color: var(--ink-faint); font-family: 'Crimson Pro', serif; font-style: italic; font-size: 0.9rem; }
-
-  /* ── SHARE MODAL ── */
-  .modal-overlay { position: fixed; inset: 0; background: rgba(44,36,24,0.6); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 1rem; }
-  .modal-overlay.hidden { display: none; }
-  .modal-box { background: var(--parchment); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; max-width: 480px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
-  .modal-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 400; color: var(--ink); margin-bottom: 1.2rem; }
-  .share-verse-preview { background: var(--ink); color: var(--parchment); border-radius: 10px; padding: 1rem 1.2rem; margin-bottom: 1.2rem; font-family: 'Playfair Display', serif; font-style: italic; font-size: 0.95rem; line-height: 1.5; }
-  .share-verse-ref { font-size: 0.8rem; color: var(--gold-light); font-style: normal; margin-top: 0.4rem; }
-  .modal-label { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-faint); font-family: 'Crimson Pro', serif; margin-bottom: 0.5rem; }
-  .friends-checklist { display: flex; flex-direction: column; gap: 0.5rem; max-height: 200px; overflow-y: auto; margin-bottom: 1.2rem; }
-  .friend-check { display: flex; align-items: center; gap: 0.7rem; padding: 0.5rem 0.7rem; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.15s; background: white; }
-  .friend-check:hover { border-color: var(--gold); }
-  .friend-check.selected { border-color: var(--gold); background: rgba(184,134,42,0.06); }
-  .friend-check input[type=checkbox] { accent-color: var(--gold); width: 14px; height: 14px; }
-  .friend-check-name { font-family: 'Crimson Pro', serif; font-size: 0.95rem; color: var(--ink); }
-  .modal-actions { display: flex; gap: 0.75rem; justify-content: flex-end; }
-  .btn-cancel { background: none; border: 1.5px solid var(--border); color: var(--ink-faint); padding: 0.55rem 1.3rem; border-radius: 8px; font-family: 'Crimson Pro', serif; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; }
-  .btn-cancel:hover { border-color: var(--ink-faint); color: var(--ink); }
-  .btn-send { background: var(--ink); color: var(--gold-light); border: none; padding: 0.55rem 1.6rem; border-radius: 8px; font-family: 'Crimson Pro', serif; font-size: 0.95rem; cursor: pointer; transition: background 0.2s; }
-  .btn-send:hover { background: var(--crimson); }
-  .no-friends-note { font-family: 'Crimson Pro', serif; font-style: italic; font-size: 0.9rem; color: var(--ink-faint); padding: 0.5rem; }
-
-  /* ── TOAST ── */
-  .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--ink); color: var(--parchment); padding: 0.8rem 1.8rem; border-radius: 50px; font-family: 'Crimson Pro', serif; font-size: 0.95rem; box-shadow: 0 8px 30px rgba(0,0,0,0.3); z-index: 999; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); pointer-events: none; border: 1px solid rgba(184,134,42,0.3); }
-  .toast.show { transform: translateX(-50%) translateY(0); }
-  .ornament { text-align: center; color: var(--gold); font-size: 1rem; margin: 2rem 0; opacity: 0.5; letter-spacing: 1rem; }
-  .translation-badge { display: inline-block; background: var(--parchment-dark); border: 1px solid var(--border); border-radius: 4px; padding: 0.1rem 0.5rem; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); font-family: 'Crimson Pro', serif; vertical-align: middle; margin-left: 0.5rem; }
-  ::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-track { background: var(--parchment); } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; } ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
-</style>
+        #audio-dock.collapsed {
+            width: auto;
+            left: auto;
+            right: 24px;
+            bottom: 24px;
+            border-radius: 9999px;
+            padding: 12px 24px;
+            border: 1px solid rgba(167, 139, 250, 0.3);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+    </style>
 </head>
-<body>
+<body class="light min-h-screen flex flex-col pb-32">
 
-<header>
-  <div class="header-inner">
-    <a class="logo" href="#" onclick="showPage('home')">
-      <span class="logo-word">Scriptura</span>
-      <span class="logo-sub">The Living Word</span>
-    </a>
-    <nav>
-      <button onclick="showPage('home')" id="nav-home" class="active">Home</button>
-      <button onclick="showPage('bible')" id="nav-bible">Read</button>
-      <button onclick="showPage('search')" id="nav-search">Search</button>
-      <button onclick="showPage('saved')" id="nav-saved">Saved</button>
-      <button onclick="showPage('liked')" id="nav-liked">Liked</button>
-      <button onclick="showPage('messages')" id="nav-messages">✉ Messages</button>
+    <nav class="glass-nav sticky top-0 z-40 py-4 px-6 sm:px-12 flex justify-between items-center gap-4">
+        <div class="logo-text text-xl font-light tracking-widest uppercase cursor-pointer select-none" onclick="showDashboard()">Lumina</div>
+        
+        <form id="search-form" class="flex w-full max-w-md relative mx-2">
+            <input type="text" id="search-input" placeholder="Search book or passage (e.g., Matthew, John 15)..." class="w-full py-2 pl-4 pr-12 rounded-full border outline-none transition-all duration-300 shadow-sm bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-sm text-black dark:text-white">
+            <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-indigo-500">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </button>
+        </form>
+
+        <div class="flex items-center gap-3">
+            <button id="parallel-toggle" class="p-2 rounded-full border border-gray-200 dark:border-zinc-800 text-xs font-medium uppercase tracking-wider hidden hover:bg-gray-100 dark:hover:bg-zinc-800 transition ui-text-main" onclick="toggleParallelMode()">Parallel</button>
+            <button id="theme-toggle" class="nav-icon p-2 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-800 transition">
+                <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg id="sun-icon" class="hidden" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+        </div>
     </nav>
-  </div>
-</header>
 
-<main>
+    <main class="flex-grow flex justify-center px-4 sm:px-8 py-8">
+        <div id="main-wrapper" class="w-full max-w-3xl transition-all duration-300">
+            
+            <div id="dashboard" class="space-y-12">
+                <div class="bg-gradient-to-br from-zinc-800 to-zinc-950 dark:from-zinc-900 dark:to-zinc-950 p-8 sm:p-12 rounded-3xl border border-zinc-800 text-center relative overflow-hidden shadow-xl text-white">
+                    <span class="text-xs font-semibold tracking-widest uppercase opacity-60 block mb-6">Verse of the Day</span>
+                    <h1 id="votd-text" class="text-2xl sm:text-3xl reading-font font-light italic mb-6 leading-relaxed">"We know that all things work together for good..."</h1>
+                    <p id="votd-ref" class="text-sm tracking-wider font-medium opacity-70 mb-6">Romans 8:28</p>
+                    <div class="flex justify-center gap-3">
+                        <button onclick="readVotd()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full text-xs font-medium transition shadow-sm">Read Chapter</button>
+                        <button onclick="copyVotd()" class="p-2 border border-zinc-700 rounded-full hover:bg-zinc-800 transition" title="Copy Text">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                        </button>
+                    </div>
+                </div>
 
-  <!-- ══════════════ HOME ══════════════ -->
-  <div id="page-home" class="page active">
-    <div class="home-hero">
-      <h1 class="home-title">The Living Word</h1>
-      <p class="home-subtitle">Search, read, and reflect upon the Holy Scriptures</p>
-      <div class="search-bar">
-        <input type="text" id="hero-search" placeholder="Search a passage, verse, or keyword…" onkeydown="if(event.key==='Enter') heroSearch()">
-        <button onclick="heroSearch()">Search</button>
-      </div>
-    </div>
+                <div class="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 p-6 sm:p-8 rounded-3xl shadow-sm space-y-6">
+                    <div class="flex justify-between items-center border-b border-gray-100 dark:border-zinc-800 pb-4">
+                        <div>
+                            <h3 class="text-sm font-semibold tracking-widest uppercase section-heading">Daily Theology Quiz</h3>
+                            <p class="text-xs text-gray-400 mt-0.5">Test and build your biblical literacy</p>
+                        </div>
+                        <div class="text-right">
+                            <span id="quiz-rank" class="text-xs font-bold text-indigo-500 uppercase tracking-wider block">Novice Disciple</span>
+                            <span id="quiz-score" class="text-[11px] font-medium opacity-60 ui-text-sub">Score: 0 pts</span>
+                        </div>
+                    </div>
+                    
+                    <div id="quiz-body" class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span id="quiz-question-num" class="text-[11px] font-bold tracking-wider text-indigo-500 uppercase">Question 1 of 3</span>
+                            <span id="quiz-category" class="text-[10px] bg-gray-100 dark:bg-zinc-800 px-2.5 py-1 rounded-full font-medium ui-text-sub">History</span>
+                        </div>
+                        <h4 id="quiz-question-text" class="text-base font-medium ui-text-main leading-snug">Loading your daily challenge...</h4>
+                        <div id="quiz-options" class="grid gap-2.5 pt-2">
+                            </div>
+                    </div>
+                </div>
 
-    <div class="qotd-card" id="qotd-card">
-      <div class="qotd-label">Quote of the Day</div>
-      <p class="qotd-verse" id="qotd-verse">Loading today's verse…</p>
-      <div class="qotd-ref" id="qotd-ref"></div>
-      <div class="qotd-actions">
-        <button class="btn-ghost" onclick="likeQotd()" id="qotd-like-btn">♡ Like</button>
-        <button class="btn-ghost" onclick="saveQotd()" id="qotd-save-btn">☆ Save</button>
-        <button class="btn-ghost" onclick="shareQotdToFriend()" id="qotd-msg-btn">✉ Send</button>
-        <button class="btn-ghost" onclick="copyQotd()">⬆ Copy</button>
-      </div>
-      <!-- Public Comments -->
-      <div class="comments-section">
-        <div class="comments-title">Community Reflections</div>
-        <div class="comment-input-row">
-          <input class="comment-name-input" id="comment-name" placeholder="Your name" maxlength="24">
-          <input class="comment-text-input" id="comment-text" placeholder="Share your reflection…" maxlength="200" onkeydown="if(event.key==='Enter') postComment()">
-          <button class="btn-comment" onclick="postComment()">Post</button>
-        </div>
-        <div class="comments-list" id="comments-list">
-          <span class="no-comments">Be the first to share a reflection…</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="ornament">✦ ✦ ✦</div>
-
-    <div class="home-grid">
-      <div class="mini-card" onclick="showPage('bible')">
-        <div class="mini-card-title"><span class="mini-card-icon">📖</span> Read the Bible</div>
-        <p class="mini-card-text">Browse book by book, chapter by chapter. From Genesis to Revelation.</p>
-      </div>
-      <div class="mini-card" onclick="showPage('search')">
-        <div class="mini-card-title"><span class="mini-card-icon">🔍</span> Keyword Search</div>
-        <p class="mini-card-text">Find verses across all of Scripture by keyword or phrase.</p>
-      </div>
-      <div class="mini-card" onclick="showPage('saved')">
-        <div class="mini-card-title"><span class="mini-card-icon">☆</span> Saved Verses</div>
-        <p class="mini-card-text">Your personal collection of saved scripture passages and verses.</p>
-      </div>
-      <div class="mini-card" onclick="showPage('messages')">
-        <div class="mini-card-title"><span class="mini-card-icon">✉</span> Scripture Chat</div>
-        <p class="mini-card-text">Share verses with friends and react with emoji.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══════════════ BIBLE READER ══════════════ -->
-  <div id="page-bible" class="page">
-    <div class="bible-controls">
-      <div class="selectors-row">
-        <div class="selector-group">
-          <label>Translation</label>
-          <select id="translation-select" onchange="loadChapter()">
-            <option value="kjv">KJV — King James Version</option>
-            <option value="web">WEB — World English Bible</option>
-          </select>
-        </div>
-        <div class="selector-group">
-          <label>Book</label>
-          <select id="book-select" onchange="updateChapters()"></select>
-        </div>
-        <div class="selector-group" style="min-width:90px; max-width:120px">
-          <label>Chapter</label>
-          <select id="chapter-select" onchange="loadChapter()"></select>
-        </div>
-      </div>
-      <div class="passage-search">
-        <input type="text" id="passage-input" placeholder="Or type a reference, e.g. John 3:16  or  Psalm 23" onkeydown="if(event.key==='Enter') searchPassage()">
-        <button class="btn-primary" onclick="searchPassage()">Go</button>
-      </div>
-    </div>
-    <div class="bible-content" id="bible-content">
-      <div class="loading">Preparing the Word</div>
-    </div>
-  </div>
-
-  <!-- ══════════════ KEYWORD SEARCH ══════════════ -->
-  <div id="page-search" class="page">
-    <div class="section-header">
-      <h2 class="section-title">Search the Scriptures</h2>
-    </div>
-    <div class="keyword-search-bar">
-      <input type="text" id="keyword-input" placeholder="e.g. love thy neighbour, forgiveness, light of the world…" onkeydown="if(event.key==='Enter') doKeywordSearch()">
-      <select id="keyword-translation">
-        <option value="kjv">KJV</option>
-        <option value="web">WEB</option>
-      </select>
-      <button class="btn-primary" onclick="doKeywordSearch()">Search</button>
-    </div>
-    <div id="keyword-results"></div>
-  </div>
-
-  <!-- ══════════════ SAVED ══════════════ -->
-  <div id="page-saved" class="page">
-    <div class="section-header">
-      <h2 class="section-title">Saved Verses</h2>
-      <span class="section-count" id="saved-count"></span>
-    </div>
-    <div id="saved-list"></div>
-  </div>
-
-  <!-- ══════════════ LIKED ══════════════ -->
-  <div id="page-liked" class="page">
-    <div class="section-header">
-      <h2 class="section-title">Liked Verses</h2>
-      <span class="section-count" id="liked-count"></span>
-    </div>
-    <div id="liked-list"></div>
-  </div>
-
-  <!-- ══════════════ MESSAGES ══════════════ -->
-  <div id="page-messages" class="page">
-    <div class="section-header">
-      <h2 class="section-title">Scripture Messenger</h2>
-      <span class="section-count">Share verses with friends</span>
-    </div>
-    <div class="msg-layout">
-      <!-- Friends Sidebar -->
-      <div class="friends-panel">
-        <div class="friends-panel-header">
-          <div class="friends-panel-title">Friends</div>
-          <div class="my-code">
-            <span class="my-code-label">Your code:</span>
-            <span class="my-code-val" id="my-code-display">——————</span>
-            <button class="copy-code-btn" onclick="copyMyCode()" title="Copy code">⎘</button>
-          </div>
-          <div class="add-friend-row">
-            <input class="add-friend-input" id="add-friend-input" placeholder="Friend's code or name" maxlength="30" onkeydown="if(event.key==='Enter') addFriend()">
-            <button class="add-friend-btn" onclick="addFriend()">+ Add</button>
-          </div>
-        </div>
-        <div class="friends-list" id="friends-list">
-          <div class="no-friends-msg">Add a friend using their 10-digit code to start sharing verses.</div>
-        </div>
-      </div>
-      <!-- Chat Panel -->
-      <div class="chat-panel" id="chat-panel">
-        <div class="chat-no-friend" id="chat-no-friend">
-          <div>
-            <div style="font-size:2rem;margin-bottom:0.8rem;opacity:0.3">✉</div>
-            <div>Select a friend to begin sharing scripture</div>
-          </div>
-        </div>
-        <div id="chat-active" style="display:none;flex-direction:column;height:100%">
-          <div class="chat-header">
-            <div class="friend-avatar" id="chat-avatar">?</div>
-            <div>
-              <div class="chat-header-name" id="chat-header-name">—</div>
-              <div class="chat-header-sub">Scripture sharing only · Reactions enabled</div>
+                <div>
+                    <h3 class="text-sm font-semibold tracking-widest uppercase opacity-40 mb-6 section-heading">Your Reading Journey</h3>
+                    <div class="grid sm:grid-cols-2 gap-4">
+                        <div class="bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-800 p-6 rounded-2xl flex flex-col justify-between text-white shadow-md">
+                            <div>
+                                <h4 class="font-medium mb-1">The Gospels in 14 Days</h4>
+                                <p class="text-xs opacity-60 mb-4">Walk through Matthew, Mark, Luke, and John.</p>
+                                <div class="w-full bg-zinc-700 h-1.5 rounded-full mb-6 overflow-hidden">
+                                    <div id="plan-gospels-progress" class="bg-indigo-500 h-full w-0 transition-all duration-300"></div>
+                                </div>
+                            </div>
+                            <button onclick="openPlan('gospels')" class="w-full py-2 bg-zinc-700/50 hover:bg-zinc-700 rounded-xl text-xs font-medium transition text-white">Continue Plan</button>
+                        </div>
+                        <div class="bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-800 p-6 rounded-2xl flex flex-col justify-between text-white shadow-md">
+                            <div>
+                                <h4 class="font-medium mb-1">Wisdom Foundations</h4>
+                                <p class="text-xs opacity-60 mb-4">Selected life wisdom from Psalms and Proverbs.</p>
+                                <div class="w-full bg-zinc-700 h-1.5 rounded-full mb-6 overflow-hidden">
+                                    <div id="plan-wisdom-progress" class="bg-indigo-500 h-full w-0 transition-all duration-300"></div>
+                                </div>
+                            </div>
+                            <button onclick="openPlan('wisdom')" class="w-full py-2 bg-zinc-700/50 hover:bg-zinc-700 rounded-xl text-xs font-medium transition text-white">Continue Plan</button>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-          <div class="chat-messages" id="chat-messages"></div>
+
+            <div id="plan-viewer" class="hidden space-y-6">
+                <button onclick="showDashboard()" class="text-xs font-medium opacity-50 hover:opacity-100 flex items-center gap-1 transition mb-4 ui-text-main">← Back to Dashboard</button>
+                <h2 id="plan-title" class="text-2xl font-light section-heading"></h2>
+                <div id="plan-days-list" class="space-y-3"></div>
+            </div>
+
+            <div id="book-chapter-selector" class="hidden space-y-6">
+                <button onclick="showDashboard()" class="text-xs font-medium opacity-50 hover:opacity-100 flex items-center gap-1 transition mb-4 ui-text-main">← Dashboard</button>
+                <h2 id="selector-book-title" class="text-3xl font-light tracking-wide capitalize section-heading"></h2>
+                <p class="text-sm opacity-50 ui-text-sub">Select a chapter to begin reading:</p>
+                <div id="chapters-grid" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-3 pt-4">
+                    </div>
+            </div>
+
+            <div id="loading" class="hidden text-center opacity-50 my-20">
+                <p class="animate-pulse text-sm tracking-widest uppercase ui-text-main">Fetching Scripture...</p>
+            </div>
+            <div id="error" class="hidden text-center text-red-500 my-20 text-sm">
+                <p>Could not locate that book or passage. Please check your spelling and try again.</p>
+            </div>
+
+            <div id="scripture-container" class="hidden">
+                <button onclick="showDashboard()" class="text-xs font-medium opacity-50 hover:opacity-100 flex items-center gap-1 transition mb-6 ui-text-main">← Dashboard</button>
+                <h2 id="reference-title" class="text-3xl font-light mb-8 text-center pb-4 border-b border-gray-200 dark:border-zinc-800 section-heading"></h2>
+                
+                <div id="reader-grid" class="grid grid-cols-1 gap-8 transition-all duration-300">
+                    <div id="primary-column" class="w-full">
+                        <div id="translation-label-1" class="text-xs font-semibold tracking-wider opacity-40 uppercase mb-4 hidden ui-text-sub">Primary (WEB)</div>
+                        <div id="verses-text" class="reading-font text-lg sm:text-xl text-justify main-bible-text select-text"></div>
+                    </div>
+                    <div id="parallel-column" class="hidden border-l border-gray-200 dark:border-zinc-800 pl-8 w-full">
+                        <div class="text-xs font-semibold tracking-wider opacity-40 uppercase mb-4 ui-text-sub">Parallel (KJV)</div>
+                        <div id="verses-text-parallel" class="reading-font text-lg sm:text-xl text-justify parallel-bible-text"></div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center border-t border-gray-200 dark:border-zinc-800 mt-16 pt-8">
+                    <button id="prev-chapter-btn" onclick="navigateChapter(-1)" class="px-4 py-2 text-sm font-medium border border-gray-200 dark:border-zinc-800 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-900 transition flex items-center gap-1 ui-text-main">
+                        ← Previous Chapter
+                    </button>
+                    <button id="next-chapter-btn" onclick="navigateChapter(1)" class="px-4 py-2 text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-sm transition flex items-center gap-1">
+                        Next Chapter →
+                    </button>
+                </div>
+            </div>
+
         </div>
-      </div>
+    </main>
+
+    <div id="verse-context-menu" class="fixed hidden bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-full shadow-2xl px-4 py-2 z-50 flex items-center gap-3">
+        <button onclick="applyHighlight('hl-yellow')" class="w-5 h-5 rounded-full bg-yellow-300/60 block border border-yellow-400"></button>
+        <button onclick="applyHighlight('hl-green')" class="w-5 h-5 rounded-full bg-green-300/60 block border border-green-400"></button>
+        <button onclick="applyHighlight('hl-blue')" class="w-5 h-5 rounded-full bg-blue-300/60 block border border-blue-400"></button>
+        <button onclick="clearHighlight()" class="text-xs opacity-50 hover:opacity-100 font-medium px-1 ui-text-main">Clear</button>
+        <div class="h-4 w-px bg-gray-200 dark:bg-zinc-700 mx-1"></div>
+        <button onclick="openNoteModal()" class="text-xs font-medium text-indigo-500 hover:text-indigo-600 flex items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3 L7 19l-4 1 1-4L16.5 3.5z"></path></svg> Note
+        </button>
     </div>
-  </div>
 
-</main>
-
-<!-- ══════════════ SHARE VERSE MODAL ══════════════ -->
-<div class="modal-overlay hidden" id="share-modal">
-  <div class="modal-box">
-    <div class="modal-title">Send this Verse</div>
-    <div class="share-verse-preview" id="share-preview-text">
-      <div id="share-preview-verse"></div>
-      <div class="share-verse-ref" id="share-preview-ref"></div>
+    <div id="dict-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4" onclick="closeDictModal()">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-gray-200 dark:border-zinc-800 transition transform scale-95" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-start mb-3">
+                <div>
+                    <h4 id="dict-term" class="text-xl font-bold text-indigo-600 dark:text-indigo-400">Word</h4>
+                    <p id="dict-root" class="text-xs font-mono opacity-50 ui-text-sub">Root Data</p>
+                </div>
+                <span class="text-[10px] uppercase font-bold px-2 py-0.5 bg-indigo-50 dark:bg-zinc-800 text-indigo-500 rounded">Lexicon</span>
+            </div>
+            <div class="space-y-3">
+                <div>
+                    <span class="text-[11px] font-bold uppercase text-gray-400 block">Definition / Meaning</span>
+                    <p id="dict-literal" class="text-sm font-medium ui-text-main">Loading details...</p>
+                </div>
+                <div>
+                    <span class="text-[11px] font-bold uppercase text-gray-400 block">Theological & Cultural Context</span>
+                    <p id="dict-context" class="text-xs leading-relaxed ui-text-sub"></p>
+                </div>
+            </div>
+            <button onclick="closeDictModal()" class="w-full mt-5 py-2 bg-gray-100 dark:bg-zinc-800 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 rounded-xl text-xs font-semibold transition ui-text-main">Close</button>
+        </div>
     </div>
-    <div class="modal-label">Send to</div>
-    <div class="friends-checklist" id="share-friends-list"></div>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeShareModal()">Cancel</button>
-      <button class="btn-send" onclick="sendVerseToFriends()">Send ✉</button>
+
+    <div id="note-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-200 dark:border-zinc-800">
+            <h4 id="note-modal-title" class="font-medium mb-2 text-sm opacity-50 ui-text-main">Study Note</h4>
+            <textarea id="note-textarea" rows="4" class="w-full border dark:border-zinc-800 bg-gray-50 dark:bg-zinc-800 rounded-xl p-3 text-sm outline-none focus:border-indigo-500 transition ui-text-main" placeholder="Write your reflections here..."></textarea>
+            <div class="flex justify-end gap-2 mt-4">
+                <button onclick="closeNoteModal()" class="px-3 py-1.5 text-xs font-medium opacity-60 hover:opacity-100 ui-text-main">Cancel</button>
+                <button onclick="saveNote()" class="px-4 py-1.5 text-xs font-medium bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700">Save Reflection</button>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
 
-<div class="toast" id="toast"></div>
+    <div id="audio-dock" class="fixed bottom-0 left-0 right-0 glass-nav py-4 px-6 sm:px-12 flex flex-col sm:flex-row justify-between items-center gap-4 z-40 hidden shadow-2xl transition-all duration-300">
+        <div id="audio-controls-wrapper" class="w-full flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3 w-full sm:w-auto">
+                <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                <p id="audio-track-title" class="text-xs font-medium tracking-wide opacity-70 uppercase ui-text-main mr-4">Audio Engine</p>
+                
+                <select id="audio-voice-select" class="text-xs bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg px-2 py-1 outline-none ui-text-main max-w-[180px]">
+                    <option value="">Loading system voices...</option>
+                </select>
+            </div>
+            <div class="flex items-center gap-6">
+                <button id="speed-085" onclick="setAudioSpeed(0.85)" class="text-[10px] font-bold tracking-wider opacity-40 hover:opacity-100 ui-text-main">0.85x</button>
+                <button id="speed-10" onclick="setAudioSpeed(1.0)" class="text-[10px] font-bold tracking-wider text-indigo-500">1.0x</button>
+                <button id="speed-125" onclick="setAudioSpeed(1.25)" class="text-[10px] font-bold tracking-wider opacity-40 hover:opacity-100 ui-text-main">1.25x</button>
+                
+                <button onclick="toggleAudio()" id="audio-play-btn" class="p-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg transition transform active:scale-95">
+                    <svg id="audio-pause-svg" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+                    <svg id="audio-play-svg" class="hidden" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                </button>
+                
+                <button onclick="stopAudio()" class="p-2 border border-gray-300 dark:border-zinc-700 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-800 transition ui-text-main" title="Close Audio Track">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>
+                </button>
+            </div>
+        </div>
 
-<script>
-// ══════════════════════════════════════════
-//  BOOKS DATA
-// ══════════════════════════════════════════
-const BOOKS = [
-  {name:"Genesis",abbr:"Gen",chapters:50,testament:"OT"},{name:"Exodus",abbr:"Exo",chapters:40,testament:"OT"},
-  {name:"Leviticus",abbr:"Lev",chapters:27,testament:"OT"},{name:"Numbers",abbr:"Num",chapters:36,testament:"OT"},
-  {name:"Deuteronomy",abbr:"Deu",chapters:34,testament:"OT"},{name:"Joshua",abbr:"Jos",chapters:24,testament:"OT"},
-  {name:"Judges",abbr:"Jdg",chapters:21,testament:"OT"},{name:"Ruth",abbr:"Rut",chapters:4,testament:"OT"},
-  {name:"1 Samuel",abbr:"1Sa",chapters:31,testament:"OT"},{name:"2 Samuel",abbr:"2Sa",chapters:24,testament:"OT"},
-  {name:"1 Kings",abbr:"1Ki",chapters:22,testament:"OT"},{name:"2 Kings",abbr:"2Ki",chapters:25,testament:"OT"},
-  {name:"1 Chronicles",abbr:"1Ch",chapters:29,testament:"OT"},{name:"2 Chronicles",abbr:"2Ch",chapters:36,testament:"OT"},
-  {name:"Ezra",abbr:"Ezr",chapters:10,testament:"OT"},{name:"Nehemiah",abbr:"Neh",chapters:13,testament:"OT"},
-  {name:"Esther",abbr:"Est",chapters:10,testament:"OT"},{name:"Job",abbr:"Job",chapters:42,testament:"OT"},
-  {name:"Psalms",abbr:"Psa",chapters:150,testament:"OT"},{name:"Proverbs",abbr:"Pro",chapters:31,testament:"OT"},
-  {name:"Ecclesiastes",abbr:"Ecc",chapters:12,testament:"OT"},{name:"Song of Solomon",abbr:"Son",chapters:8,testament:"OT"},
-  {name:"Isaiah",abbr:"Isa",chapters:66,testament:"OT"},{name:"Jeremiah",abbr:"Jer",chapters:52,testament:"OT"},
-  {name:"Lamentations",abbr:"Lam",chapters:5,testament:"OT"},{name:"Ezekiel",abbr:"Eze",chapters:48,testament:"OT"},
-  {name:"Daniel",abbr:"Dan",chapters:12,testament:"OT"},{name:"Hosea",abbr:"Hos",chapters:14,testament:"OT"},
-  {name:"Joel",abbr:"Joe",chapters:3,testament:"OT"},{name:"Amos",abbr:"Amo",chapters:9,testament:"OT"},
-  {name:"Obadiah",abbr:"Oba",chapters:1,testament:"OT"},{name:"Jonah",abbr:"Jon",chapters:4,testament:"OT"},
-  {name:"Micah",abbr:"Mic",chapters:7,testament:"OT"},{name:"Nahum",abbr:"Nah",chapters:3,testament:"OT"},
-  {name:"Habakkuk",abbr:"Hab",chapters:3,testament:"OT"},{name:"Zephaniah",abbr:"Zep",chapters:3,testament:"OT"},
-  {name:"Haggai",abbr:"Hag",chapters:2,testament:"OT"},{name:"Zechariah",abbr:"Zec",chapters:14,testament:"OT"},
-  {name:"Malachi",abbr:"Mal",chapters:4,testament:"OT"},
-  {name:"Matthew",abbr:"Mat",chapters:28,testament:"NT"},{name:"Mark",abbr:"Mar",chapters:16,testament:"NT"},
-  {name:"Luke",abbr:"Luk",chapters:24,testament:"NT"},{name:"John",abbr:"Joh",chapters:21,testament:"NT"},
-  {name:"Acts",abbr:"Act",chapters:28,testament:"NT"},{name:"Romans",abbr:"Rom",chapters:16,testament:"NT"},
-  {name:"1 Corinthians",abbr:"1Co",chapters:16,testament:"NT"},{name:"2 Corinthians",abbr:"2Co",chapters:13,testament:"NT"},
-  {name:"Galatians",abbr:"Gal",chapters:6,testament:"NT"},{name:"Ephesians",abbr:"Eph",chapters:6,testament:"NT"},
-  {name:"Philippians",abbr:"Phi",chapters:4,testament:"NT"},{name:"Colossians",abbr:"Col",chapters:4,testament:"NT"},
-  {name:"1 Thessalonians",abbr:"1Th",chapters:5,testament:"NT"},{name:"2 Thessalonians",abbr:"2Th",chapters:3,testament:"NT"},
-  {name:"1 Timothy",abbr:"1Ti",chapters:6,testament:"NT"},{name:"2 Timothy",abbr:"2Ti",chapters:4,testament:"NT"},
-  {name:"Titus",abbr:"Tit",chapters:3,testament:"NT"},{name:"Philemon",abbr:"Phm",chapters:1,testament:"NT"},
-  {name:"Hebrews",abbr:"Heb",chapters:13,testament:"NT"},{name:"James",abbr:"Jam",chapters:5,testament:"NT"},
-  {name:"1 Peter",abbr:"1Pe",chapters:5,testament:"NT"},{name:"2 Peter",abbr:"2Pe",chapters:3,testament:"NT"},
-  {name:"1 John",abbr:"1Jo",chapters:5,testament:"NT"},{name:"2 John",abbr:"2Jo",chapters:1,testament:"NT"},
-  {name:"3 John",abbr:"3Jo",chapters:1,testament:"NT"},{name:"Jude",abbr:"Jud",chapters:1,testament:"NT"},
-  {name:"Revelation",abbr:"Rev",chapters:22,testament:"NT"},
-];
+        <button id="dock-size-toggle" onclick="toggleDockSize()" class="absolute top-1/2 -translate-y-1/2 right-2 sm:right-4 p-1 rounded hover:bg-gray-200 dark:hover:bg-zinc-800 opacity-60 hover:opacity-100 transition ui-text-main" title="Collapse/Expand Deck">
+            <svg id="dock-collapse-svg" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="6 9 12 15 18 9"></polygon></svg>
+            <svg id="dock-expand-svg" class="hidden" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="18 15 12 9 6 15"></polygon></svg>
+        </button>
+    </div>
 
-const QOTD_POOL = [
-  {text:"For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.", ref:"John 3:16", book:"Joh", ch:3},
-  {text:"The Lord is my shepherd; I shall not want.", ref:"Psalm 23:1", book:"Psa", ch:23},
-  {text:"I can do all things through Christ who strengthens me.", ref:"Philippians 4:13", book:"Phi", ch:4},
-  {text:"And we know that in all things God works for the good of those who love him.", ref:"Romans 8:28", book:"Rom", ch:8},
-  {text:"Be still, and know that I am God.", ref:"Psalm 46:10", book:"Psa", ch:46},
-  {text:"Trust in the Lord with all your heart and lean not on your own understanding.", ref:"Proverbs 3:5", book:"Pro", ch:3},
-  {text:"The Lord bless you and keep you; the Lord make his face shine on you and be gracious to you.", ref:"Numbers 6:24–25", book:"Num", ch:6},
-  {text:"But those who hope in the Lord will renew their strength. They will soar on wings like eagles.", ref:"Isaiah 40:31", book:"Isa", ch:40},
-  {text:"For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you.", ref:"Jeremiah 29:11", book:"Jer", ch:29},
-  {text:"Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God.", ref:"Philippians 4:6", book:"Phi", ch:4},
-  {text:"Come to me, all you who are weary and burdened, and I will give you rest.", ref:"Matthew 11:28", book:"Mat", ch:11},
-  {text:"Love is patient, love is kind. It does not envy, it does not boast, it is not proud.", ref:"1 Corinthians 13:4", book:"1Co", ch:13},
-];
+    <script>
+        let currentChapterText = "";
+        let currentVerseSelection = null;
+        let isParallelMode = false;
+        let currentActiveQuery = "";
+        let isDockCollapsed = false;
+        
+        let currentBook = "";
+        let currentChapterNum = 1;
 
-// Stop words for keyword search filtering
-const STOP_WORDS = new Set([
-  'the','a','an','and','or','but','in','on','at','to','for','of','with','by','from',
-  'up','about','into','through','during','is','are','was','were','be','been','being',
-  'have','has','had','do','does','did','will','would','could','should','may','might',
-  'shall','can','need','dare','ought','used','it','its','he','she','they','we','i',
-  'you','him','her','them','us','me','my','your','his','our','their','this','that',
-  'these','those','what','which','who','whom','when','where','why','how','all','both',
-  'each','few','more','most','other','some','such','no','nor','not','only','own',
-  'same','so','than','too','very','just','then','now','also','as','if','after','before'
-]);
+        let currentVerseIndex = 0;
+        let verseElementsArray = [];
+        let availableVoices = [];
+        let currentUtterance = null;
+        let speechSpeed = 1.0;
 
-// ══════════════════════════════════════════
-//  STATE
-// ══════════════════════════════════════════
-let state = {
-  currentBook: 'Joh',
-  currentChapter: 3,
-  translation: 'kjv',
-  saved: JSON.parse(localStorage.getItem('scriptura_saved') || '[]'),
-  liked: JSON.parse(localStorage.getItem('scriptura_liked') || '[]'),
-  qotdIndex: null,
-  currentFriend: null,
-  shareVerseData: null,
-  activeEmojiMsgId: null,
-};
+        // Specialized Rigorous Biblical & Cultural Lexicon Dataset
+        const theologicalDictionary = {
+            "propitiation": { 
+                term: "Propitiation", 
+                root: "Greek: Hilasmos (ἱλασμός)", 
+                literal: "The turning away of wrath by an offering.", 
+                context: "Often confused with 'expiation' (the wiping away of sin). Propitiation specifically means satisfying the righteous justice of God so that mercy can be righteously extended to the sinner." 
+            },
+            "sanctification": { 
+                term: "Sanctification", 
+                root: "Greek: Hagiasmos (ἁγιασμός)", 
+                literal: "The process of being set apart or made holy.", 
+                context: "While 'Justification' is a one-time legal declaration that a Christian is righteous, Sanctification is the lifelong, cooperative process where the Holy Spirit transforms a believer's actual character into the likeness of Christ." 
+            },
+            "sheol": { 
+                term: "Sheol", 
+                root: "Hebrew: Sheol (שְׁאוֹל)", 
+                literal: "The place of the dead, the underworld, or the pit.", 
+                context: "In the Old Testament, this doesn't necessarily mean 'Hell' as a place of fire and torment. It was understood as the shadowy, silent realm where all the departed spirits went before the full revelation of the resurrection was made known in the New Testament." 
+            },
+            "phylacteries": { 
+                term: "Phylacteries", 
+                root: "Greek: Phylakterion (φυλακτήριον) / Hebrew: Tefillin", 
+                literal: "Safeguards, amulets, or small leather boxes.", 
+                context: "These are small leather cases containing strips of Torah parchment. Jewish men strapped them to their foreheads and left arms during prayer to literally obey Deuteronomy 6:8 ('bind them as a sign on your hand'). Jesus critiqued the Pharisees not for wearing them, but for making them wide to show off." 
+            },
+            "centurion": { 
+                term: "Centurion", 
+                root: "Latin: Centurio / Greek: Hekatontarches", 
+                literal: "Commander of a century (approximately 80–100 Roman soldiers).", 
+                context: "Centurions were the backbone of the Roman army—highly professional, disciplined career officers. In the Gospels and Acts, centurions are remarkably always portrayed in a positive, honorable light when interacting with Jesus and the Apostles." 
+            },
+            "talent": { 
+                term: "Talent", 
+                root: "Greek: Talanton (τάλαντον)", 
+                literal: "A massive unit of weight/currency (approx. 75 pounds of metal).", 
+                context: "When modern readers see 'talent', they think of natural skills. In ancient times, it was an astronomical sum of money. One single talent was worth about 6,000 denarii—which represented roughly 20 years of labor for a common working man." 
+            },
+            "denarius": { 
+                term: "Denarius", 
+                root: "Latin/Greek: Denarion (δηνάριον)", 
+                literal: "A Roman silver coin.", 
+                context: "This was the standard silver coin of the Roman Empire. It represented exactly one standard day's wage for a common agricultural laborer or a soldier. Knowing this shifts how you read parables involving debts and wages." 
+            },
+            "samaritans": { 
+                term: "The Samaritans", 
+                root: "Hebrew: Shomronim", 
+                literal: "Inhabitants of Samaria.", 
+                context: "A mixed ethnic/religious group resulting from the Assyrian conquest of Israel. They accepted only the Torah (first 5 books) and worshiped on Mt. Gerizim instead of Jerusalem. The animosity between Jews and Samaritans was deeply bitter, making Jesus' 'Good Samaritan' parable completely scandalous to his listeners." 
+            },
+            "eucharist": { 
+                term: "Eucharist", 
+                root: "Greek: Eucharistia (εὐχαριστία)", 
+                literal: "Giving of thanks, gratitude.", 
+                context: "The term used by early Christians to describe Communion or the Lord's Supper, originating from the moment Jesus took the bread and 'gave thanks' during the Last Supper." 
+            },
+            "herodians": { 
+                term: "Herodians", 
+                root: "Greek: Herodanoi", 
+                literal: "Partisans or political supporters of Herod.", 
+                context: "This was a political faction rather than a religious sect. They supported the dynasty of Herod the Great and, by extension, Roman rule. Ironically, they hated the Pharisees, yet teamed up with them in the Gospels because both viewed Jesus as a dangerous threat to the status quo." 
+            }
+        };
 
-function saveState() {
-  localStorage.setItem('scriptura_saved', JSON.stringify(state.saved));
-  localStorage.setItem('scriptura_liked', JSON.stringify(state.liked));
-}
+        // Trivia Bank
+        const triviaBank = [
+            { question: "Which prophet was sent to preach repentance to the city of Nineveh?", options: ["Isaiah", "Jonah", "Amos", "Hosea"], correct: 1, category: "History" },
+            { question: "What does the term 'Gospel' (Greek: Euangelion) literally mean?", options: ["Holy Law", "Good News", "Sacred Scroll", "Divine Vision"], correct: 1, category: "Theology" },
+            { question: "Who was chosen as the king of Israel immediately after Saul?", options: ["Solomon", "Samuel", "David", "Jonathan"], correct: 2, category: "History" }
+        ];
 
-// ══════════════════════════════════════════
-//  PERSISTENT STORAGE HELPERS
-//  Uses window.storage API (persistent across sessions)
-// ══════════════════════════════════════════
+        const bibleBooksMeta = {
+            "genesis": 50, "exodus": 40, "leviticus": 27, "numbers": 36, "deuteronomy": 34, "joshua": 24, "judges": 21, "ruth": 4,
+            "1 samuel": 31, "2 samuel": 24, "1 kings": 22, "2 kings": 25, "1 chronicles": 29, "2 chronicles": 36, "ezra": 10, "nehemiah": 13,
+            "esther": 10, "job": 42, "psalms": 150, "proverbs": 31, "ecclesiastes": 12, "song of solomon": 8, "isaiah": 66, "jeremiah": 52,
+            "lamentations": 5, "ezekiel": 48, "daniel": 12, "hosea": 14, "joel": 3, "amos": 9, "obadiah": 1, "jonah": 4, "micah": 7,
+            "nahum": 3, "habakkuk": 3, "zephaniah": 3, "haggai": 2, "zechariah": 14, "malachi": 4,
+            "matthew": 28, "mark": 16, "luke": 24, "john": 21, "acts": 28, "romans": 16, "1 corinthians": 16, "2 corinthians": 13,
+            "galatians": 6, "ephesians": 6, "philippians": 4, "colossians": 4, "1 thessalonians": 5, "2 thessalonians": 3, "1 timothy": 6,
+            "2 timothy": 4, "titus": 3, "philemon": 1, "hebrews": 13, "james": 5, "1 peter": 5, "2 peter": 3, "1 john": 5, "2 john": 1,
+            "3 john": 1, "jude": 1, "revelation": 22
+        };
 
-async function storageGet(key, shared=false) {
-  try { const r = await window.storage.get(key, shared); return r ? r.value : null; }
-  catch(e) { return null; }
-}
-async function storageSet(key, value, shared=false) {
-  try { await window.storage.set(key, value, shared); return true; }
-  catch(e) { return false; }
-}
-async function storageList(prefix, shared=false) {
-  try { const r = await window.storage.list(prefix, shared); return r ? r.keys : []; }
-  catch(e) { return []; }
-}
+        let userData = JSON.parse(localStorage.getItem('lumina_bible_userdata')) || {
+            highlights: {}, notes: {}, quizScore: 0, currentQuizIdx: 0, planProgress: { gospels: [], wisdom: [] }
+        };
 
-// ══════════════════════════════════════════
-//  USER IDENTITY
-// ══════════════════════════════════════════
+        const plansConfig = {
+            gospels: [
+                { id: "g1", label: "Day 1: Matthew 1-7", target: "Matthew 1" },
+                { id: "g2", label: "Day 2: Matthew 8-14", target: "Matthew 8" },
+                { id: "g3", label: "Day 3: Matthew 15-22", target: "Matthew 15" },
+                { id: "g4", label: "Day 4: Matthew 23-28", target: "Matthew 23" },
+                { id: "g5", label: "Day 5: Mark 1-8", target: "Mark 1" },
+                { id: "g6", label: "Day 6: Mark 9-16", target: "Mark 9" },
+                { id: "g7", label: "Day 7: Luke 1-6", target: "Luke 1" },
+                { id: "g8", label: "Day 8: Luke 7-12", target: "Luke 7" },
+                { id: "g9", label: "Day 9: Luke 13-18", target: "Luke 13" },
+                { id: "g10", label: "Day 10: Luke 19-24", target: "Luke 19" },
+                { id: "g11", label: "Day 11: John 1-6", target: "John 1" },
+                { id: "g12", label: "Day 12: John 7-12", target: "John 7" },
+                { id: "g13", label: "Day 13: John 13-17", target: "John 13" },
+                { id: "g14", label: "Day 14: John 18-21", target: "John 18" }
+            ],
+            wisdom: [
+                { id: "w1", label: "Day 1: Heart of Wisdom", target: "Psalm 111" },
+                { id: "w2", label: "Day 2: Walking in Integrity", target: "Proverbs 10" },
+                { id: "w3", label: "Day 3: Trusting God Entirely", target: "Proverbs 3" },
+                { id: "w4", label: "Day 4: Safety & Shelter", target: "Psalm 91" },
+                { id: "w5", label: "Day 5: The Good Shepherd", target: "Psalm 23" }
+            ]
+        };
 
-function getMyUserId() {
-  let uid = localStorage.getItem('scriptura_uid');
-  if (!uid) {
-    uid = generateCode();
-    localStorage.setItem('scriptura_uid', uid);
-  }
-  return uid;
-}
+        const staticVotd = { ref: "Romans 8:28", text: "We know that all things work together for good for those who love God, to those who are called according to his purpose." };
 
-function generateCode() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let code = '';
-  for (let i = 0; i < 10; i++) code += chars[Math.floor(Math.random() * chars.length)];
-  return code;
-}
+        const body = document.body;
+        const dashboard = document.getElementById('dashboard');
+        const planViewer = document.getElementById('plan-viewer');
+        const bookChapterSelector = document.getElementById('book-chapter-selector');
+        const scriptureContainer = document.getElementById('scripture-container');
+        const loading = document.getElementById('loading');
+        const error = document.getElementById('error');
+        const mainWrapper = document.getElementById('main-wrapper');
+        const parallelToggle = document.getElementById('parallel-toggle');
+        const contextMenu = document.getElementById('verse-context-menu');
+        const noteModal = document.getElementById('note-modal');
+        const noteTextarea = document.getElementById('note-textarea');
+        const audioDock = document.getElementById('audio-dock');
 
-function getMyDisplayName() {
-  return localStorage.getItem('scriptura_name') || 'Anonymous';
-}
+        function saveStorage() {
+            localStorage.setItem('lumina_bible_userdata', JSON.stringify(userData));
+            updateProgressBars();
+        }
 
-// ══════════════════════════════════════════
-//  NAVIGATION
-// ══════════════════════════════════════════
+        function showDashboard() {
+            stopAudio();
+            scriptureContainer.classList.add('hidden');
+            planViewer.classList.add('hidden');
+            bookChapterSelector.classList.add('hidden');
+            error.classList.add('hidden');
+            loading.classList.add('hidden');
+            parallelToggle.classList.add('hidden');
+            dashboard.classList.remove('hidden');
+            mainWrapper.className = "w-full max-w-3xl";
+            window.scrollTo({top: 0, behavior: 'smooth'});
+            renderQuizState();
+        }
 
-function showPage(page) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-  document.getElementById('page-' + page).classList.add('active');
-  document.getElementById('nav-' + page).classList.add('active');
-  if (page === 'bible') renderBible();
-  if (page === 'saved') renderSavedPage();
-  if (page === 'liked') renderLikedPage();
-  if (page === 'messages') renderMessagesPage();
-}
-
-// ══════════════════════════════════════════
-//  BIBLE SELECTORS
-// ══════════════════════════════════════════
-
-function setupSelectors() {
-  const bookSel = document.getElementById('book-select');
-  let lastTestament = '';
-  BOOKS.forEach(b => {
-    if (b.testament !== lastTestament) {
-      const og = document.createElement('optgroup');
-      og.label = b.testament === 'OT' ? '— Old Testament —' : '— New Testament —';
-      bookSel.appendChild(og);
-      lastTestament = b.testament;
-    }
-    const opt = document.createElement('option');
-    opt.value = b.abbr; opt.textContent = b.name;
-    if (b.abbr === state.currentBook) opt.selected = true;
-    bookSel.appendChild(opt);
-  });
-  updateChapters(false);
-}
-
-function updateChapters(doLoad=true) {
-  const abbr = document.getElementById('book-select').value;
-  state.currentBook = abbr;
-  const book = BOOKS.find(b => b.abbr === abbr);
-  const chSel = document.getElementById('chapter-select');
-  chSel.innerHTML = '';
-  for (let i = 1; i <= book.chapters; i++) {
-    const opt = document.createElement('option');
-    opt.value = i; opt.textContent = i;
-    if (i === state.currentChapter) opt.selected = true;
-    chSel.appendChild(opt);
-  }
-  if (doLoad) { state.currentChapter = 1; chSel.value = 1; loadChapter(); }
-}
-
-// ══════════════════════════════════════════
-//  API
-// ══════════════════════════════════════════
-
-async function fetchChapter(book, chapter, translation) {
-  const url = `https://bible-api.com/${encodeURIComponent(book)}+${chapter}?translation=${translation}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error('Not found');
-  return await res.json();
-}
-
-async function fetchVerse(ref, translation) {
-  const url = `https://bible-api.com/${encodeURIComponent(ref)}?translation=${translation}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error('Not found');
-  return await res.json();
-}
-
-// ══════════════════════════════════════════
-//  BIBLE READER
-// ══════════════════════════════════════════
-
-function renderBible() {
-  const bookSel = document.getElementById('book-select');
-  if (!bookSel.options.length) setupSelectors();
-}
-
-async function loadChapter() {
-  state.currentBook = document.getElementById('book-select').value;
-  state.currentChapter = parseInt(document.getElementById('chapter-select').value);
-  state.translation = document.getElementById('translation-select').value;
-  const content = document.getElementById('bible-content');
-  content.innerHTML = '<div class="loading">Seeking the passage</div>';
-  try {
-    const data = await fetchChapter(state.currentBook, state.currentChapter, state.translation);
-    renderChapterContent(data);
-  } catch(e) {
-    content.innerHTML = '<div class="loading">Could not load this passage. Please try another.</div>';
-  }
-}
-
-function renderChapterContent(data) {
-  const bookName = BOOKS.find(b => b.abbr === state.currentBook)?.name || state.currentBook;
-  const content = document.getElementById('bible-content');
-  const translLabel = state.translation === 'kjv' ? 'KJV' : 'WEB';
-  let html = `<div class="chapter-header"><div class="chapter-book">${bookName}</div><h2 class="chapter-title"><span>Chapter</span> ${state.currentChapter} <span class="translation-badge">${translLabel}</span></h2></div><div class="verse-container">`;
-  const verses = data.verses || [];
-  verses.forEach(v => {
-    const ref = `${bookName} ${v.chapter}:${v.verse}`;
-    const isSaved = state.saved.some(s => s.ref === ref);
-    const isLiked = state.liked.some(l => l.ref === ref);
-    const text = v.text.trim().replace(/\n/g, ' ');
-    html += `<div class="verse" id="verse-${v.verse}">
-      <span class="verse-num">${v.verse}</span>
-      <span class="verse-text">${escapeHtml(text)}</span>
-      <div class="verse-actions">
-        <button class="verse-btn ${isSaved?'saved':''}" onclick="toggleSave('${escapeAttr(ref)}','${escapeAttr(text)}')" title="Save">☆</button>
-        <button class="verse-btn ${isLiked?'liked':''}" onclick="toggleLike('${escapeAttr(ref)}','${escapeAttr(text)}')" title="Like">♡</button>
-        <button class="verse-btn msg-btn" onclick="openShareModal('${escapeAttr(ref)}','${escapeAttr(text)}')" title="Send to friend">✉</button>
-      </div>
-    </div>`;
-  });
-  const book = BOOKS.find(b => b.abbr === state.currentBook);
-  const prevCh = state.currentChapter > 1 ? state.currentChapter - 1 : null;
-  const nextCh = state.currentChapter < book.chapters ? state.currentChapter + 1 : null;
-  html += `</div><div class="chapter-nav">
-    <button onclick="navChapter(${prevCh})" ${!prevCh?'disabled style="opacity:0.3;cursor:default"':''}>← Chapter ${prevCh||''}</button>
-    <span class="chapter-nav-center">${bookName} ${state.currentChapter}</span>
-    <button onclick="navChapter(${nextCh})" ${!nextCh?'disabled style="opacity:0.3;cursor:default"':''}>Chapter ${nextCh||''} →</button>
-  </div>`;
-  content.innerHTML = html;
-}
-
-function navChapter(ch) {
-  if (!ch) return;
-  state.currentChapter = ch;
-  document.getElementById('chapter-select').value = ch;
-  loadChapter();
-  window.scrollTo({ top: document.getElementById('bible-content').offsetTop - 80, behavior: 'smooth' });
-}
-
-// ══════════════════════════════════════════
-//  KEYWORD SEARCH
-// ══════════════════════════════════════════
-
-async function doKeywordSearch() {
-  const raw = document.getElementById('keyword-input').value.trim();
-  const translation = document.getElementById('keyword-translation').value;
-  if (!raw) return;
-
-  // Extract meaningful keywords (filter stop words, short words)
-  const tokens = raw.toLowerCase().replace(/[^a-z0-9\s']/g,'').split(/\s+/).filter(w => w.length > 2 && !STOP_WORDS.has(w));
-  if (!tokens.length) {
-    document.getElementById('keyword-results').innerHTML = `<div class="search-results-meta">Please enter more specific keywords (avoid common words like "the", "and", "a")</div>`;
-    return;
-  }
-
-  const resultsDiv = document.getElementById('keyword-results');
-  resultsDiv.innerHTML = `<div class="loading">Searching the Scriptures for "${escapeHtml(tokens.join(', '))}"</div>`;
-
-  // Use bible-api.com search endpoint — search by primary keyword
-  const primaryKeyword = tokens[0];
-
-  try {
-    const url = `https://bible-api.com/?q=${encodeURIComponent(primaryKeyword)}&translation=${translation}`;
-    const res = await fetch(url);
-
-    if (!res.ok) throw new Error('Search failed');
-    const data = await res.json();
-
-    let verses = data.verses || [];
-    if (!verses.length && data.text) {
-      verses = [{ book_name: data.reference, chapter: 1, verse: 1, text: data.text }];
-    }
-
-    // Score and filter: prefer verses containing more of the keywords
-    const scored = verses.map(v => {
-      const lower = v.text.toLowerCase();
-      const score = tokens.reduce((acc, kw) => acc + (lower.includes(kw) ? 1 : 0), 0);
-      return { ...v, score };
-    }).filter(v => v.score > 0);
-
-    scored.sort((a, b) => b.score - a.score);
-    const top = scored.slice(0, 30);
-
-    if (!top.length) {
-      resultsDiv.innerHTML = `<div class="search-results-meta">No results found for "${escapeHtml(tokens.join(' '))}". Try a different keyword.</div>`;
-      return;
-    }
-
-    const translLabel = translation === 'kjv' ? 'KJV' : 'WEB';
-    resultsDiv.innerHTML = `<div class="search-results-meta">${top.length} result${top.length!==1?'s':''} for "<strong>${escapeHtml(tokens.join(', '))}</strong>" · ${translLabel}</div>` +
-      top.map(v => {
-        const ref = `${v.book_name} ${v.chapter}:${v.verse}`;
-        const text = v.text.trim().replace(/\n/g,' ');
-        // Highlight all keywords in text
-        let highlighted = escapeHtml(text);
-        tokens.forEach(kw => {
-          const re = new RegExp(`(${kw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
-          highlighted = highlighted.replace(re, '<mark>$1</mark>');
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('votd-text').textContent = `"${staticVotd.text}"`;
+            document.getElementById('votd-ref').textContent = staticVotd.ref;
+            updateProgressBars();
+            renderQuizState();
         });
-        const isSaved = state.saved.some(s => s.ref === ref);
-        const isLiked = state.liked.some(l => l.ref === ref);
-        return `<div class="search-result-card">
-          <div class="search-result-ref">${escapeHtml(ref)}</div>
-          <div class="search-result-text">${highlighted}</div>
-          <div class="search-result-actions">
-            <button class="verse-btn ${isSaved?'saved':''}" onclick="toggleSave('${escapeAttr(ref)}','${escapeAttr(text)}')">☆ Save</button>
-            <button class="verse-btn ${isLiked?'liked':''}" onclick="toggleLike('${escapeAttr(ref)}','${escapeAttr(text)}')">♡ Like</button>
-            <button class="verse-btn msg-btn" onclick="openShareModal('${escapeAttr(ref)}','${escapeAttr(text)}')">✉ Send</button>
-          </div>
-        </div>`;
-      }).join('');
-  } catch(e) {
-    resultsDiv.innerHTML = `<div class="search-results-meta">Could not complete search. Please try again.</div>`;
-  }
-}
 
-// ══════════════════════════════════════════
-//  SAVE / LIKE
-// ══════════════════════════════════════════
+        // Quiz Engine Logic
+        function renderQuizState() {
+            document.getElementById('quiz-score').textContent = `Score: ${userData.quizScore || 0} pts`;
+            updateQuizRankTitle();
 
-function toggleSave(ref, text) {
-  const idx = state.saved.findIndex(s => s.ref === ref);
-  if (idx >= 0) { state.saved.splice(idx, 1); showToast('Verse removed from saved'); }
-  else { state.saved.push({ ref, text, date: Date.now() }); showToast('Verse saved ☆'); }
-  saveState();
-}
+            const idx = userData.currentQuizIdx || 0;
+            const optionsContainer = document.getElementById('quiz-options');
+            
+            if(idx >= triviaBank.length) {
+                document.getElementById('quiz-question-num').textContent = "Complete";
+                document.getElementById('quiz-category').textContent = "End";
+                document.getElementById('quiz-question-text').textContent = "You've finished your daily challenge! Come back tomorrow for brand new trivia concepts.";
+                optionsContainer.innerHTML = `<button onclick="resetQuizProgress()" class="py-2 px-4 rounded-xl text-xs bg-indigo-600 text-white font-medium hover:bg-indigo-700 mx-auto transition">Reset Progress</button>`;
+                return;
+            }
 
-function toggleLike(ref, text) {
-  const idx = state.liked.findIndex(l => l.ref === ref);
-  if (idx >= 0) { state.liked.splice(idx, 1); showToast('Like removed'); }
-  else { state.liked.push({ ref, text, date: Date.now() }); showToast('Verse liked ♡'); }
-  saveState();
-}
+            const currentQ = triviaBank[idx];
+            document.getElementById('quiz-question-num').textContent = `Question ${idx + 1} of ${triviaBank.length}`;
+            document.getElementById('quiz-category').textContent = currentQ.category;
+            document.getElementById('quiz-question-text').textContent = currentQ.question;
+            
+            optionsContainer.innerHTML = "";
+            currentQ.options.forEach((opt, optIdx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-3 text-sm border rounded-xl font-medium transition duration-200 bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 hover:border-indigo-500 ui-text-main";
+                btn.textContent = opt;
+                btn.onclick = () => submitQuizAnswer(optIdx, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
 
-// ══════════════════════════════════════════
-//  QUOTE OF THE DAY
-// ══════════════════════════════════════════
+        function submitQuizAnswer(selectedIdx, clickedButton) {
+            const idx = userData.currentQuizIdx || 0;
+            const currentQ = triviaBank[idx];
+            const allButtons = document.getElementById('quiz-options').querySelectorAll('button');
 
-function loadQotd() {
-  const today = new Date();
-  const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 86400000);
-  const idx = dayOfYear % QOTD_POOL.length;
-  state.qotdIndex = idx;
-  const q = QOTD_POOL[idx];
-  document.getElementById('qotd-verse').textContent = `"${q.text}"`;
-  document.getElementById('qotd-ref').textContent = `— ${q.ref}`;
-  const isLiked = state.liked.some(l => l.ref === q.ref);
-  const isSaved = state.saved.some(s => s.ref === q.ref);
-  if (isLiked) document.getElementById('qotd-like-btn').classList.add('liked');
-  if (isSaved) document.getElementById('qotd-save-btn').textContent = '★ Saved';
-  loadComments(idx);
-}
+            allButtons.forEach(b => b.disabled = true);
 
-function likeQotd() {
-  const q = QOTD_POOL[state.qotdIndex];
-  toggleLike(q.ref, q.text);
-  const btn = document.getElementById('qotd-like-btn');
-  btn.classList.toggle('liked');
-  btn.textContent = btn.classList.contains('liked') ? '♥ Liked' : '♡ Like';
-}
-function saveQotd() {
-  const q = QOTD_POOL[state.qotdIndex];
-  toggleSave(q.ref, q.text);
-  document.getElementById('qotd-save-btn').textContent = state.saved.some(s => s.ref === q.ref) ? '★ Saved' : '☆ Save';
-}
-function copyQotd() {
-  const q = QOTD_POOL[state.qotdIndex];
-  const text = `"${q.text}" — ${q.ref}`;
-  if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => showToast('Verse copied ✓'));
-  else showToast('Copied: ' + q.ref);
-}
-function shareQotdToFriend() {
-  const q = QOTD_POOL[state.qotdIndex];
-  openShareModal(q.ref, q.text);
-}
+            if(selectedIdx === currentQ.correct) {
+                clickedButton.className = "w-full text-left p-3 text-sm border rounded-xl font-semibold bg-emerald-100 dark:bg-emerald-950/40 border-emerald-500 text-emerald-700 dark:text-emerald-400";
+                userData.quizScore = (userData.quizScore || 0) + 10;
+            } else {
+                clickedButton.className = "w-full text-left p-3 text-sm border rounded-xl font-semibold bg-red-100 dark:bg-red-950/40 border-red-500 text-red-700 dark:text-red-400";
+                allButtons[currentQ.correct].className = "w-full text-left p-3 text-sm border rounded-xl font-semibold bg-emerald-100 dark:bg-emerald-950/40 border-emerald-500 text-emerald-700 dark:text-emerald-400";
+            }
 
-// ══════════════════════════════════════════
-//  PUBLIC COMMENTS (shared storage)
-// ══════════════════════════════════════════
+            setTimeout(() => {
+                userData.currentQuizIdx = idx + 1;
+                saveStorage();
+                renderQuizState();
+            }, 1800);
+        }
 
-async function loadComments(qotdIdx) {
-  const key = `comments:qotd:${qotdIdx}`;
-  const raw = await storageGet(key, true);
-  const comments = raw ? JSON.parse(raw) : [];
-  renderComments(comments);
-}
+        function updateQuizRankTitle() {
+            const s = userData.quizScore || 0;
+            let rank = "Novice Disciple";
+            if (s >= 10 && s < 25) rank = "Dedicated Scribe";
+            if (s >= 25) rank = "Berean Scholar";
+            document.getElementById('quiz-rank').textContent = rank;
+        }
 
-async function postComment() {
-  const nameEl = document.getElementById('comment-name');
-  const textEl = document.getElementById('comment-text');
-  const name = nameEl.value.trim() || 'Anonymous';
-  const text = textEl.value.trim();
-  if (!text) { showToast('Please write a reflection first'); return; }
+        function resetQuizProgress() {
+            userData.quizScore = 0;
+            userData.currentQuizIdx = 0;
+            saveStorage();
+            renderQuizState();
+        }
 
-  const key = `comments:qotd:${state.qotdIndex}`;
-  const raw = await storageGet(key, true);
-  const comments = raw ? JSON.parse(raw) : [];
+        function readVotd() { fetchScripture(staticVotd.ref); }
+        function copyVotd() {
+            navigator.clipboard.writeText(`${staticVotd.text} - ${staticVotd.ref}`);
+            alert("Verse copied elegantly to clipboard!");
+        }
 
-  comments.push({ name, text, time: Date.now(), id: Math.random().toString(36).slice(2) });
-  // Keep latest 50 comments
-  const trimmed = comments.slice(-50);
-  await storageSet(key, JSON.stringify(trimmed), true);
+        document.getElementById('search-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const rawQuery = document.getElementById('search-input').value.trim().toLowerCase();
+            if (!rawQuery) return;
 
-  textEl.value = '';
-  renderComments(trimmed);
-  showToast('Reflection posted ✦');
-}
+            if (bibleBooksMeta.hasOwnProperty(rawQuery)) {
+                openBookSelector(rawQuery);
+            } else {
+                fetchScripture(rawQuery);
+            }
+        });
 
-function renderComments(comments) {
-  const list = document.getElementById('comments-list');
-  if (!comments.length) {
-    list.innerHTML = '<span class="no-comments">Be the first to share a reflection…</span>';
-    return;
-  }
-  list.innerHTML = [...comments].reverse().map(c => `
-    <div class="comment-item">
-      <div class="comment-avatar">${escapeHtml(c.name.slice(0,2).toUpperCase())}</div>
-      <div class="comment-body">
-        <div class="comment-author">${escapeHtml(c.name)}</div>
-        <div class="comment-text-display">${escapeHtml(c.text)}</div>
-        <div class="comment-time">${timeAgo(c.time)}</div>
-      </div>
-    </div>
-  `).join('');
-}
+        function openBookSelector(bookKey) {
+            stopAudio();
+            dashboard.classList.add('hidden');
+            planViewer.classList.add('hidden');
+            scriptureContainer.classList.add('hidden');
+            error.classList.add('hidden');
+            loading.classList.add('hidden');
+            parallelToggle.classList.add('hidden');
+            
+            const titleEl = document.getElementById('selector-book-title');
+            const gridEl = document.getElementById('chapters-grid');
+            
+            titleEl.textContent = bookKey;
+            gridEl.innerHTML = "";
 
-function timeAgo(ts) {
-  const diff = Date.now() - ts;
-  if (diff < 60000) return 'just now';
-  if (diff < 3600000) return Math.floor(diff/60000) + 'm ago';
-  if (diff < 86400000) return Math.floor(diff/3600000) + 'h ago';
-  return Math.floor(diff/86400000) + 'd ago';
-}
+            const totalChapters = bibleBooksMeta[bookKey];
+            for (let i = 1; i <= totalChapters; i++) {
+                const btn = document.createElement('button');
+                btn.className = "py-3 rounded-xl border border-gray-200 dark:border-zinc-800 text-sm font-medium hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 transition duration-150 bg-gray-50 dark:bg-zinc-900 text-neutral-900 dark:text-neutral-100 shadow-sm";
+                btn.textContent = i;
+                btn.onclick = () => fetchScripture(`${bookKey} ${i}`);
+                gridEl.appendChild(btn);
+            }
 
-// ══════════════════════════════════════════
-//  MESSAGES / FRIENDS
-// ══════════════════════════════════════════
+            bookChapterSelector.classList.remove('hidden');
+            mainWrapper.className = "w-full max-w-3xl";
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
 
-function getFriends() {
-  return JSON.parse(localStorage.getItem('scriptura_friends') || '[]');
-}
-function saveFriends(friends) {
-  localStorage.setItem('scriptura_friends', JSON.stringify(friends));
-}
+        async function fetchScripture(query, primaryOnlyParallelSync = false) {
+            if (!query) return;
+            if(!primaryOnlyParallelSync) {
+                currentActiveQuery = query;
+                dashboard.classList.add('hidden');
+                planViewer.classList.add('hidden');
+                bookChapterSelector.classList.add('hidden');
+                scriptureContainer.classList.add('hidden');
+                error.classList.add('hidden');
+                loading.classList.remove('hidden');
+                parallelToggle.classList.remove('hidden');
+            }
 
-async function renderMessagesPage() {
-  const uid = getMyUserId();
-  document.getElementById('my-code-display').textContent = uid;
+            applyViewGridConstraints();
 
-  // Register this user in shared storage so others can find them
-  await storageSet(`user:${uid}`, JSON.stringify({ uid, name: getMyDisplayName(), ts: Date.now() }), true);
+            try {
+                const res1 = await fetch(`https://bible-api.com/${encodeURIComponent(query)}?translation=web`);
+                if (!res1.ok) throw new Error();
+                const data1 = await res1.json();
 
-  renderFriendsList();
-}
+                if (data1.verses && data1.verses.length > 0) {
+                    currentBook = data1.verses[0].book_name.toLowerCase();
+                    currentChapterNum = data1.verses[0].chapter;
+                }
 
-function renderFriendsList() {
-  const friends = getFriends();
-  const list = document.getElementById('friends-list');
-  if (!friends.length) {
-    list.innerHTML = '<div class="no-friends-msg">Add a friend using their 10-digit code to start sharing verses.</div>';
-    return;
-  }
-  list.innerHTML = friends.map(f => `
-    <div class="friend-item ${state.currentFriend === f.uid ? 'active' : ''}" onclick="selectFriend('${f.uid}', '${escapeAttr(f.name)}')">
-      <div class="friend-avatar">${escapeHtml(f.name.slice(0,2).toUpperCase())}</div>
-      <span class="friend-name">${escapeHtml(f.name)}</span>
-      <button class="remove-friend-btn" onclick="event.stopPropagation(); removeFriend('${f.uid}')" title="Remove">✕</button>
-    </div>
-  `).join('');
-}
+                document.getElementById('reference-title').textContent = data1.reference;
+                currentChapterText = data1.verses.map(v => v.text).join(' ');
 
-async function addFriend() {
-  const input = document.getElementById('add-friend-input');
-  const val = input.value.trim().toUpperCase();
-  if (!val) return;
+                let htmlCol1 = "";
+                data1.verses.forEach(v => {
+                    const uniqueKey = `${data1.reference.split(':')[0].trim()}:${v.verse}`;
+                    const appliedClass = userData.highlights[uniqueKey] || "";
+                    const hasNote = userData.notes[uniqueKey] ? "border-b-2 border-dotted border-indigo-400" : "";
+                    
+                    let processedText = v.text.trim();
+                    htmlCol1 += `<span class="verse-span ${appliedClass} ${hasNote}" data-key="${uniqueKey}" onclick="triggerContextMenu(event, '${uniqueKey}')"><span class="verse-num">${v.verse}</span>${processedText} </span>`;
+                });
+                document.getElementById('verses-text').innerHTML = htmlCol1;
 
-  const myUid = getMyUserId();
-  if (val === myUid) { showToast("That's your own code!"); return; }
+                if(isParallelMode || primaryOnlyParallelSync) {
+                    const res2 = await fetch(`https://bible-api.com/${encodeURIComponent(query)}?translation=kjv`);
+                    if(res2.ok) {
+                        const data2 = await res2.json();
+                        let htmlCol2 = "";
+                        data2.verses.forEach(v => {
+                            htmlCol2 += `<span><span class="verse-num">${v.verse}</span>${v.text.trim()} </span>`;
+                        });
+                        document.getElementById('verses-text-parallel').innerHTML = htmlCol2;
+                    }
+                }
 
-  const friends = getFriends();
-  if (friends.find(f => f.uid === val)) { showToast('Already in your friends list'); input.value=''; return; }
+                updateNavigationButtons();
 
-  // Look up user in shared storage
-  const raw = await storageGet(`user:${val}`, true);
-  let friendName = val; // fallback to code as name
-  if (raw) {
-    const u = JSON.parse(raw);
-    friendName = u.name || val;
-  }
+                loading.classList.add('hidden');
+                scriptureContainer.classList.remove('hidden');
+                initAudioEngine();
+                window.scrollTo({top: 0, behavior: 'smooth'});
 
-  friends.push({ uid: val, name: friendName === 'Anonymous' ? val : friendName });
-  saveFriends(friends);
-  input.value = '';
-  renderFriendsList();
-  showToast(`${friendName} added as a friend ✦`);
-}
+            } catch (err) {
+                loading.classList.add('hidden');
+                error.classList.remove('hidden');
+            }
+        }
 
-function removeFriend(uid) {
-  const friends = getFriends().filter(f => f.uid !== uid);
-  saveFriends(friends);
-  if (state.currentFriend === uid) {
-    state.currentFriend = null;
-    document.getElementById('chat-no-friend').style.display = 'flex';
-    document.getElementById('chat-active').style.display = 'none';
-  }
-  renderFriendsList();
-  showToast('Friend removed');
-}
+        // Smart Word Selector and Dictionary Engine Trigger
+        function triggerContextMenu(e, verseKey) {
+            e.stopPropagation();
+            currentVerseSelection = verseKey;
+            
+            // Look closely at what specific text was highlighted or double-clicked
+            const selection = window.getSelection();
+            const clickedText = selection.toString().trim();
+            
+            // Sanitize raw text to strip off trailing ancient punctuation
+            const cleanWord = clickedText.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"']/g, "").toLowerCase();
 
-async function selectFriend(uid, name) {
-  state.currentFriend = uid;
-  renderFriendsList();
+            // If an actual singular word block was intercepted, look it up immediately
+            if (cleanWord.length > 1) {
+                let lookupWord = cleanWord;
+                // Handle standard plural variations safely
+                if (cleanWord.endsWith('s') && !theologicalDictionary[cleanWord]) {
+                    lookupWord = cleanWord.slice(0, -1);
+                }
 
-  document.getElementById('chat-no-friend').style.display = 'none';
-  const chatActive = document.getElementById('chat-active');
-  chatActive.style.display = 'flex';
-  document.getElementById('chat-header-name').textContent = name;
-  document.getElementById('chat-avatar').textContent = name.slice(0,2).toUpperCase();
+                if (theologicalDictionary[lookupWord]) {
+                    triggerDictionaryCard(theologicalDictionary[lookupWord]);
+                    return; 
+                } else {
+                    fetchDefaultDictionary(cleanWord);
+                    return;
+                }
+            }
 
-  await loadChat(uid);
-}
+            // Sync: Skip narrative voice tracker directly to this targeted line item
+            jumpAudioToVerse(verseKey);
 
-function getChatKey(uid1, uid2) {
-  // deterministic key regardless of who initiated
-  return 'chat:' + [uid1, uid2].sort().join(':');
-}
+            // Fallback: If white space or regular single tap occurred, open standard notes utility
+            contextMenu.style.position = 'fixed';
+            contextMenu.style.top = `${e.clientY - 60}px`;
+            contextMenu.style.left = `${Math.min(window.innerWidth - 220, e.clientX - 50)}px`;
+            contextMenu.classList.remove('hidden');
+        }
 
-async function loadChat(friendUid) {
-  const myUid = getMyUserId();
-  const key = getChatKey(myUid, friendUid);
-  const raw = await storageGet(key, true);
-  const messages = raw ? JSON.parse(raw) : [];
-  renderChat(messages, myUid);
-}
+        // Dedicated Biblical Dictionary View Sync
+        function triggerDictionaryCard(data) {
+            document.getElementById('dict-term').textContent = data.term;
+            document.getElementById('dict-root').textContent = data.root;
+            document.getElementById('dict-literal').textContent = data.literal;
+            document.getElementById('dict-context').textContent = data.context;
+            document.getElementById('dict-modal').classList.remove('hidden');
+        }
 
-function renderChat(messages, myUid) {
-  const container = document.getElementById('chat-messages');
-  if (!messages.length) {
-    container.innerHTML = '<div class="chat-empty">No messages yet. Share a verse to begin the conversation.</div>';
-    return;
-  }
-  container.innerHTML = messages.map(m => {
-    const isMine = m.from === myUid;
-    const reactions = m.reactions || {};
-    const reactionHtml = Object.entries(reactions).filter(([,c]) => c > 0).map(([emoji, count]) =>
-      `<span class="reaction-pill" onclick="addReaction('${m.id}','${emoji}')">${emoji} <span class="r-count">${count}</span></span>`
-    ).join('') + `<button class="add-reaction-btn" onclick="toggleEmojiPicker('${m.id}')">+ react</button>
-    <div class="emoji-picker" id="ep-${m.id}" style="display:none;position:absolute;${isMine?'right:0':'left:0'};bottom:2rem;z-index:50">
-      ${['🙏','❤️','✨','🕊️','😭','🔥','💛','👑','🌿','✝️'].map(e => `<span class="emoji-opt" onclick="addReaction('${m.id}','${e}');toggleEmojiPicker('${m.id}')">${e}</span>`).join('')}
-    </div>`;
-    return `<div class="msg-bubble ${isMine?'mine':'theirs'}">
-      ${!isMine ? `<div class="msg-sender">${escapeHtml(m.fromName||'Friend')}</div>` : ''}
-      <div class="msg-quote-box">
-        <div class="msg-quote-text">"${escapeHtml(m.text)}"</div>
-        <div class="msg-quote-ref">— ${escapeHtml(m.ref)}</div>
-      </div>
-      <div class="msg-time">${timeAgo(m.ts)}</div>
-      <div class="msg-reactions" style="position:relative">${reactionHtml}</div>
-    </div>`;
-  }).join('');
-  container.scrollTop = container.scrollHeight;
-}
+        // Third-Party Global Fallback API Engine Link
+        async function fetchDefaultDictionary(word) {
+            document.getElementById('dict-term').textContent = word;
+            document.getElementById('dict-root').textContent = "English Lexicon";
+            document.getElementById('dict-literal').textContent = "Searching vocabulary database...";
+            document.getElementById('dict-context').textContent = "";
+            document.getElementById('dict-modal').classList.remove('hidden');
 
-async function addReaction(msgId, emoji) {
-  if (!state.currentFriend) return;
-  const myUid = getMyUserId();
-  const key = getChatKey(myUid, state.currentFriend);
-  const raw = await storageGet(key, true);
-  const messages = raw ? JSON.parse(raw) : [];
-  const msg = messages.find(m => m.id === msgId);
-  if (!msg) return;
-  if (!msg.reactions) msg.reactions = {};
-  msg.reactions[emoji] = (msg.reactions[emoji] || 0) + 1;
-  await storageSet(key, JSON.stringify(messages), true);
-  renderChat(messages, myUid);
-}
+            try {
+                const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+                if (!res.ok) throw new Error();
+                const data = await res.json();
+                
+                const definition = data[0].meanings[0].definitions[0].definition;
+                const partOfSpeech = data[0].meanings[0].partOfSpeech;
 
-function toggleEmojiPicker(msgId) {
-  const picker = document.getElementById(`ep-${msgId}`);
-  if (!picker) return;
-  const showing = picker.style.display !== 'none';
-  document.querySelectorAll('.emoji-picker').forEach(p => p.style.display = 'none');
-  if (!showing) picker.style.display = 'flex';
-}
+                document.getElementById('dict-root').textContent = `Grammar: ${partOfSpeech}`;
+                document.getElementById('dict-literal').textContent = definition;
+                document.getElementById('dict-context').textContent = "Standard linguistic translation. For deep biblical tenses, archeology settings, or temple currencies, try double-clicking explicit structural keywords (like 'Talent', 'Centurion', or 'Sanctification').";
+            } catch (err) {
+                document.getElementById('dict-literal').textContent = "Definition not found.";
+                document.getElementById('dict-context').textContent = "We could not find a clear definition for this specific selection. Try highlighting exactly one whole word cleanly.";
+            }
+        }
 
-// ══════════════════════════════════════════
-//  SHARE VERSE MODAL
-// ══════════════════════════════════════════
+        function closeDictModal() {
+            document.getElementById('dict-modal').classList.add('hidden');
+        }
 
-function openShareModal(ref, text) {
-  const friends = getFriends();
-  state.shareVerseData = { ref, text };
-  document.getElementById('share-preview-verse').textContent = `"${text}"`;
-  document.getElementById('share-preview-ref').textContent = `— ${ref}`;
+        function applyViewGridConstraints() {
+            const readerGrid = document.getElementById('reader-grid');
+            const parallelCol = document.getElementById('parallel-column');
+            const label1 = document.getElementById('translation-label-1');
 
-  const list = document.getElementById('share-friends-list');
-  if (!friends.length) {
-    list.innerHTML = '<div class="no-friends-note">You have no friends yet. Add one from the Messages page using their 10-digit code.</div>';
-  } else {
-    list.innerHTML = friends.map(f => `
-      <label class="friend-check" onclick="this.classList.toggle('selected')">
-        <input type="checkbox" value="${f.uid}" class="share-recipient">
-        <span class="friend-check-name">${escapeHtml(f.name)}</span>
-      </label>
-    `).join('');
-  }
-  document.getElementById('share-modal').classList.remove('hidden');
-}
+            if (isParallelMode) {
+                mainWrapper.className = "w-full max-w-6xl transition-all duration-300";
+                readerGrid.classList.replace('grid-cols-1', 'md:grid-cols-2');
+                parallelCol.classList.remove('hidden');
+                label1.classList.remove('hidden');
+            } else {
+                mainWrapper.className = "w-full max-w-3xl transition-all duration-300";
+                readerGrid.classList.replace('md:grid-cols-2', 'grid-cols-1');
+                parallelCol.classList.add('hidden');
+                label1.classList.add('hidden');
+            }
+        }
 
-function closeShareModal() {
-  document.getElementById('share-modal').classList.add('hidden');
-  state.shareVerseData = null;
-}
+        function updateNavigationButtons() {
+            const maxChapters = bibleBooksMeta[currentBook] || 1;
+            const prevBtn = document.getElementById('prev-chapter-btn');
+            const nextBtn = document.getElementById('next-chapter-btn');
 
-async function sendVerseToFriends() {
-  if (!state.shareVerseData) return;
-  const selected = [...document.querySelectorAll('.share-recipient:checked')].map(el => el.value);
-  if (!selected.length) { showToast('Select at least one friend'); return; }
+            if (currentChapterNum <= 1) {
+                prevBtn.style.visibility = 'hidden';
+            } else {
+                prevBtn.style.visibility = 'visible';
+                prevBtn.textContent = `← Chapter ${currentChapterNum - 1}`;
+            }
 
-  const myUid = getMyUserId();
-  const { ref, text } = state.shareVerseData;
-  const msgId = Date.now().toString(36) + Math.random().toString(36).slice(2);
-  const msg = { id: msgId, from: myUid, fromName: getMyDisplayName(), ref, text, ts: Date.now(), reactions: {} };
+            if (currentChapterNum >= maxChapters) {
+                nextBtn.style.visibility = 'hidden';
+            } else {
+                nextBtn.style.visibility = 'visible';
+                nextBtn.textContent = `Chapter ${currentChapterNum + 1} →`;
+            }
+        }
 
-  for (const friendUid of selected) {
-    const key = getChatKey(myUid, friendUid);
-    const raw = await storageGet(key, true);
-    const messages = raw ? JSON.parse(raw) : [];
-    messages.push(msg);
-    await storageSet(key, JSON.stringify(messages.slice(-200)), true);
-  }
+        function navigateChapter(direction) {
+            const targetChapter = currentChapterNum + direction;
+            const maxChapters = bibleBooksMeta[currentBook] || 1;
+            
+            if (targetChapter >= 1 && targetChapter <= maxChapters) {
+                fetchScripture(`${currentBook} ${targetChapter}`);
+            }
+        }
 
-  closeShareModal();
-  showToast(`Verse sent to ${selected.length} friend${selected.length>1?'s':''} ✉`);
-  if (state.currentFriend && selected.includes(state.currentFriend)) {
-    await loadChat(state.currentFriend);
-  }
-}
+        function toggleParallelMode() {
+            isParallelMode = !isParallelMode;
+            applyViewGridConstraints();
+            
+            if (isParallelMode) {
+                parallelToggle.classList.add('bg-indigo-100', 'dark:bg-zinc-800', 'text-indigo-600');
+                fetchScripture(currentActiveQuery, true);
+            } else {
+                parallelToggle.classList.remove('bg-indigo-100', 'dark:bg-zinc-800', 'text-indigo-600');
+            }
+        }
 
-function copyMyCode() {
-  const code = getMyUserId();
-  if (navigator.clipboard) navigator.clipboard.writeText(code).then(() => showToast('Code copied: ' + code));
-  else showToast('Your code: ' + code);
-}
+        // Feature 3: Native Highlighting and Autoscroll Core Voice Engine
+        function loadSystemVoices() {
+            availableVoices = window.speechSynthesis.getVoices();
+            const voiceSelect = document.getElementById('audio-voice-select');
+            if (!voiceSelect) return;
+            
+            voiceSelect.innerHTML = '';
+            const englishVoices = availableVoices.filter(v => v.lang.startsWith('en'));
+            
+            englishVoices.forEach((voice) => {
+                const option = document.createElement('option');
+                option.value = voice.name;
+                const isPremium = voice.name.includes('Natural') || voice.name.includes('Enhanced') ? ' ✨' : '';
+                option.textContent = `${voice.name} (${voice.lang})${isPremium}`;
+                voiceSelect.appendChild(option);
+            });
 
-// ══════════════════════════════════════════
-//  HERO SEARCH
-// ══════════════════════════════════════════
+            const naturalDefault = englishVoices.find(v => v.name.includes('Natural') || v.name.includes('Google'));
+            if (naturalDefault) {
+                voiceSelect.value = naturalDefault.name;
+            }
+        }
 
-function heroSearch() {
-  const q = document.getElementById('hero-search').value.trim();
-  if (!q) return;
-  // Check if it looks like a reference (contains digits)
-  if (/\d/.test(q)) {
-    document.getElementById('passage-input').value = q;
-    showPage('bible');
-    setTimeout(() => searchPassage(), 100);
-  } else {
-    document.getElementById('keyword-input').value = q;
-    showPage('search');
-    setTimeout(() => doKeywordSearch(), 100);
-  }
-}
+        if (typeof window.speechSynthesis !== 'undefined' && window.speechSynthesis.onvoiceschanged !== undefined) {
+            window.speechSynthesis.onvoiceschanged = loadSystemVoices;
+        }
 
-async function searchPassage() {
-  const q = document.getElementById('passage-input').value.trim();
-  if (!q) return;
-  const chapterMatch = q.match(/^(\d?\s?[a-zA-Z\s]+)\s+(\d+)$/);
-  if (chapterMatch && !q.includes(':')) {
-    const bookName = chapterMatch[1].trim();
-    const ch = parseInt(chapterMatch[2]);
-    const book = BOOKS.find(b => b.name.toLowerCase() === bookName.toLowerCase() || b.abbr.toLowerCase() === bookName.toLowerCase());
-    if (book) {
-      state.currentBook = book.abbr;
-      state.currentChapter = ch;
-      document.getElementById('book-select').value = book.abbr;
-      updateChapters(false);
-      document.getElementById('chapter-select').value = ch;
-      loadChapter();
-      return;
-    }
-  }
-  const content = document.getElementById('bible-content');
-  content.innerHTML = '<div class="loading">Searching the Scriptures</div>';
-  try {
-    const translation = document.getElementById('translation-select').value;
-    const data = await fetchVerse(q, translation);
-    const translLabel = translation === 'kjv' ? 'KJV' : 'WEB';
-    let html = `<div class="chapter-header"><div class="chapter-book">Search Results</div><h2 class="chapter-title"><span>${escapeHtml(data.reference)}</span> <span class="translation-badge">${translLabel}</span></h2></div><div class="verse-container">`;
-    const verses = data.verses || [];
-    verses.forEach(v => {
-      const ref = `${data.reference.split(':')[0].trim()}:${v.verse}`;
-      const text = v.text.trim().replace(/\n/g,' ');
-      const isSaved = state.saved.some(s => s.ref === ref);
-      const isLiked = state.liked.some(l => l.ref === ref);
-      html += `<div class="verse"><span class="verse-num">${v.verse}</span><span class="verse-text">${escapeHtml(text)}</span>
-        <div class="verse-actions">
-          <button class="verse-btn ${isSaved?'saved':''}" onclick="toggleSave('${escapeAttr(ref)}','${escapeAttr(text)}')">☆</button>
-          <button class="verse-btn ${isLiked?'liked':''}" onclick="toggleLike('${escapeAttr(ref)}','${escapeAttr(text)}')">♡</button>
-          <button class="verse-btn msg-btn" onclick="openShareModal('${escapeAttr(ref)}','${escapeAttr(text)}')">✉</button>
-        </div></div>`;
-    });
-    html += '</div>';
-    content.innerHTML = html;
-  } catch(e) {
-    content.innerHTML = `<div class="loading">No results for "${escapeHtml(q)}". Try a reference like "John 3:16"</div>`;
-  }
-}
+        function initAudioEngine() {
+            window.speechSynthesis.cancel();
+            document.getElementById('audio-track-title').textContent = document.getElementById('reference-title').textContent;
+            
+            verseElementsArray = Array.from(document.querySelectorAll('#verses-text .verse-span'));
+            currentVerseIndex = 0;
+            
+            loadSystemVoices();
+            audioDock.classList.remove('hidden');
+            expandAudioDock();
+        }
 
-// ══════════════════════════════════════════
-//  SAVED / LIKED PAGE RENDERERS
-// ══════════════════════════════════════════
+        function toggleAudio() {
+            if (window.speechSynthesis.speaking) {
+                if (window.speechSynthesis.paused) {
+                    window.speechSynthesis.resume();
+                    setAudioPlaybackUIVisual(true);
+                } else {
+                    window.speechSynthesis.pause();
+                    setAudioPlaybackUIVisual(false);
+                }
+            } else {
+                speakCurrentVerse();
+            }
+        }
 
-function renderSavedPage() {
-  const list = document.getElementById('saved-list');
-  const count = document.getElementById('saved-count');
-  count.textContent = `${state.saved.length} verse${state.saved.length!==1?'s':''}`;
-  if (!state.saved.length) { list.innerHTML = `<div class="empty-state"><div class="empty-state-icon">☆</div><div class="empty-state-text">No saved verses yet</div><div class="empty-state-sub">Press the ☆ button on any verse to save it here.</div></div>`; return; }
-  list.innerHTML = [...state.saved].reverse().map((v,i) => `
-    <div class="quote-card">
-      <div class="quote-card-actions">
-        <button class="icon-btn" onclick="openShareModal('${escapeAttr(v.ref)}','${escapeAttr(v.text)}')" title="Send">✉</button>
-        <button class="icon-btn" onclick="removeSaved(${state.saved.length-1-i})" title="Remove">✕</button>
-      </div>
-      <p class="quote-card-text">"${escapeHtml(v.text)}"</p>
-      <div class="quote-card-ref">— ${escapeHtml(v.ref)}</div>
-    </div>
-  `).join('');
-}
+        function speakCurrentVerse() {
+            window.speechSynthesis.cancel();
+            
+            if (currentVerseIndex >= verseElementsArray.length) {
+                stopAudio();
+                return;
+            }
 
-function renderLikedPage() {
-  const list = document.getElementById('liked-list');
-  const count = document.getElementById('liked-count');
-  count.textContent = `${state.liked.length} verse${state.liked.length!==1?'s':''}`;
-  if (!state.liked.length) { list.innerHTML = `<div class="empty-state"><div class="empty-state-icon">♡</div><div class="empty-state-text">No liked verses yet</div><div class="empty-state-sub">Press the ♡ button on any verse to like it.</div></div>`; return; }
-  list.innerHTML = [...state.liked].reverse().map((v,i) => `
-    <div class="quote-card">
-      <div class="quote-card-actions">
-        <button class="icon-btn" onclick="openShareModal('${escapeAttr(v.ref)}','${escapeAttr(v.text)}')" title="Send">✉</button>
-        <button class="icon-btn" onclick="removeLiked(${state.liked.length-1-i})" title="Remove">✕</button>
-      </div>
-      <p class="quote-card-text">"${escapeHtml(v.text)}"</p>
-      <div class="quote-card-ref">— ${escapeHtml(v.ref)}</div>
-    </div>
-  `).join('');
-}
+            verseElementsArray.forEach(el => el.classList.remove('audio-active'));
 
-function removeSaved(idx) { state.saved.splice(idx,1); saveState(); renderSavedPage(); showToast('Removed'); }
-function removeLiked(idx) { state.liked.splice(idx,1); saveState(); renderLikedPage(); showToast('Removed'); }
+            const currentElement = verseElementsArray[currentVerseIndex];
+            currentElement.classList.add('audio-active');
 
-// ══════════════════════════════════════════
-//  HELPERS
-// ══════════════════════════════════════════
+            // Autoscroll: Centers focused verse smoothly on client interface
+            currentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-function escapeHtml(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function escapeAttr(str) {
-  return String(str).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"').replace(/\n/g,' ');
-}
+            const textToRead = currentElement.innerText.replace(/^\d+/, '').trim();
+            currentUtterance = new SpeechSynthesisUtterance(textToRead);
+            currentUtterance.rate = speechSpeed;
 
-let toastTimeout;
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(toastTimeout);
-  toastTimeout = setTimeout(() => t.classList.remove('show'), 2600);
-}
+            const selectedVoiceName = document.getElementById('audio-voice-select').value;
+            const selectedVoice = availableVoices.find(v => v.name === selectedVoiceName);
+            if (selectedVoice) {
+                currentUtterance.voice = selectedVoice;
+            }
 
-// Close modal on overlay click
-document.getElementById('share-modal').addEventListener('click', function(e) {
-  if (e.target === this) closeShareModal();
-});
+            currentUtterance.onend = () => {
+                currentVerseIndex++;
+                speakCurrentVerse();
+            };
 
-// Close emoji pickers on outside click
-document.addEventListener('click', function(e) {
-  if (!e.target.closest('.emoji-picker') && !e.target.closest('.add-reaction-btn')) {
-    document.querySelectorAll('.emoji-picker').forEach(p => p.style.display = 'none');
-  }
-});
+            currentUtterance.onerror = () => {
+                setAudioPlaybackUIVisual(false);
+            };
 
-// ══════════════════════════════════════════
-//  INIT
-// ══════════════════════════════════════════
+            window.speechSynthesis.speak(currentUtterance);
+            setAudioPlaybackUIVisual(true);
+        }
 
-document.addEventListener('DOMContentLoaded', () => {
-  setupSelectors();
-  loadQotd();
-  getMyUserId(); // ensure uid is generated
-});
-</script>
+        function jumpAudioToVerse(targetKey) {
+            const idx = verseElementsArray.findIndex(el => el.getAttribute('data-key') === targetKey);
+            if (idx !== -1) {
+                currentVerseIndex = idx;
+                if (window.speechSynthesis.speaking) {
+                    speakCurrentVerse();
+                }
+            }
+        }
+
+        function stopAudio() {
+            window.speechSynthesis.cancel();
+            if(verseElementsArray) {
+                verseElementsArray.forEach(el => el.classList.remove('audio-active'));
+            }
+            setAudioPlaybackUIVisual(false);
+            audioDock.classList.add('hidden');
+        }
+
+        function setAudioSpeed(speed) {
+            speechSpeed = speed;
+            if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+                speakCurrentVerse();
+            }
+            ['085', '10', '125'].forEach(id => {
+                document.getElementById(`speed-${id}`).className = "text-[10px] font-bold tracking-wider opacity-40 hover:opacity-100 ui-text-main";
+            });
+            const activeId = speed === 0.85 ? '085' : speed === 1.0 ? '10' : '125';
+            document.getElementById(`speed-${activeId}`).className = "text-[10px] font-bold tracking-wider text-indigo-500";
+        }
+
+        function setAudioPlaybackUIVisual(isPlaying) {
+            if(isPlaying) {
+                document.getElementById('audio-pause-svg').classList.remove('hidden');
+                document.getElementById('audio-play-svg').classList.add('hidden');
+            } else {
+                document.getElementById('audio-pause-svg').classList.add('hidden');
+                document.getElementById('audio-play-svg').classList.remove('hidden');
+            }
+        }
+
+        function toggleDockSize() {
+            if(isDockCollapsed) { expandAudioDock(); } 
+            else { collapseAudioDock(); }
+        }
+
+        function collapseAudioDock() {
+            isDockCollapsed = true;
+            audioDock.classList.add('collapsed');
+            document.getElementById('audio-controls-wrapper').classList.add('hidden');
+            document.getElementById('dock-collapse-svg').classList.add('hidden');
+            document.getElementById('dock-expand-svg').classList.remove('hidden');
+            document.getElementById('dock-size-toggle').className = "p-1 rounded hover:bg-gray-200 dark:hover:bg-zinc-800 transition ui-text-main relative transform top-0 left-0 translate-y-0";
+        }
+
+        function expandAudioDock() {
+            isDockCollapsed = false;
+            audioDock.classList.remove('collapsed');
+            document.getElementById('audio-controls-wrapper').classList.remove('hidden');
+            document.getElementById('dock-expand-svg').classList.add('hidden');
+            document.getElementById('dock-collapse-svg').classList.remove('hidden');
+            document.getElementById('dock-size-toggle').className = "absolute top-1/2 -translate-y-1/2 right-2 sm:right-4 p-1 rounded hover:bg-gray-200 dark:hover:bg-zinc-800 opacity-60 hover:opacity-100 transition ui-text-main";
+        }
+
+        document.addEventListener('click', () => { contextMenu.classList.add('hidden'); });
+
+        function applyHighlight(colorClass) {
+            if (!currentVerseSelection) return;
+            userData.highlights[currentVerseSelection] = colorClass;
+            saveStorage();
+            refreshVerseDOMState(currentVerseSelection);
+        }
+
+        function clearHighlight() {
+            if (!currentVerseSelection) return;
+            delete userData.highlights[currentVerseSelection];
+            saveStorage();
+            refreshVerseDOMState(currentVerseSelection);
+        }
+
+        function openNoteModal() {
+            if (!currentVerseSelection) return;
+            document.getElementById('note-modal-title').textContent = `Reflection Note: ${currentVerseSelection}`;
+            noteTextarea.value = userData.notes[currentVerseSelection] || "";
+            noteModal.classList.remove('hidden');
+        }
+
+        function closeNoteModal() { noteModal.classList.add('hidden'); }
+
+        function saveNote() {
+            if (!currentVerseSelection) return;
+            const val = noteTextarea.value.trim();
+            if(val) { userData.notes[currentVerseSelection] = val; } 
+            else { delete userData.notes[currentVerseSelection]; }
+            saveStorage();
+            refreshVerseDOMState(currentVerseSelection);
+            closeNoteModal();
+        }
+
+        function refreshVerseDOMState(key) {
+            const el = document.querySelector(`[data-key="${key}"]`);
+            if(!el) return;
+            
+            const hasNote = userData.notes[key] ? " border-b-2 border-dotted border-indigo-400" : "";
+            const hClass = userData.highlights[key] ? ` ${userData.highlights[key]}` : "";
+            el.className = `verse-span${hClass}${hasNote}`;
+        }
+
+        function updateProgressBars() {
+            ['gospels', 'wisdom'].forEach(plan => {
+                const checkedCount = userData.planProgress[plan].length;
+                const totalCount = plansConfig[plan].length;
+                const pct = Math.round((checkedCount / totalCount) * 100);
+                const el = document.getElementById(`plan-${plan}-progress`);
+                if(el) el.style.width = `${pct}%`;
+            });
+        }
+
+        function openPlan(planKey) {
+            dashboard.classList.add('hidden');
+            scriptureContainer.classList.add('hidden');
+            bookChapterSelector.classList.add('hidden');
+            const container = document.getElementById('plan-days-list');
+            container.innerHTML = "";
+            
+            document.getElementById('plan-title').textContent = planKey === 'gospels' ? 'The Gospels in 14 Days' : 'Wisdom Foundations';
+            
+            plansConfig[planKey].forEach(day => {
+                const isChecked = userData.planProgress[planKey].includes(day.id);
+                const item = document.createElement('div');
+                item.className = "bg-gradient-to-r from-zinc-800 to-zinc-900 border border-zinc-800 p-4 rounded-xl flex justify-between items-center text-white shadow-sm";
+                item.innerHTML = `
+                    <div class="flex items-center gap-3 cursor-pointer" onclick="fetchScripture('${day.target}')">
+                        <div class="p-2 rounded-lg bg-zinc-700/50 text-indigo-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                        </div>
+                        <span class="text-sm font-medium hover:text-indigo-400 transition text-white">${day.label}</span>
+                    </div>
+                    <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="togglePlanDay('${planKey}', '${day.id}', this.checked)" class="w-4 h-4 rounded text-indigo-600 border-gray-300 focus:ring-indigo-500 accent-indigo-600">
+                `;
+                container.appendChild(item);
+            });
+            planViewer.classList.remove('hidden');
+        }
+
+        function togglePlanDay(planKey, dayId, isChecked) {
+            if(isChecked) {
+                if(!userData.planProgress[planKey].includes(dayId)) userData.planProgress[planKey].push(dayId);
+            } else {
+                userData.planProgress[planKey] = userData.planProgress[planKey].filter(id => id !== dayId);
+            }
+            saveStorage();
+        }
+
+        const themeToggle = document.getElementById('theme-toggle');
+        const moonIcon = document.getElementById('moon-icon');
+        const sunIcon = document.getElementById('sun-icon');
+
+        themeToggle.addEventListener('click', () => {
+            if (body.classList.contains('light')) {
+                body.classList.replace('light', 'dark');
+                moonIcon.classList.add('hidden');
+                sunIcon.classList.remove('hidden');
+            } else {
+                body.classList.replace('dark', 'light');
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
+        });
+    </script>
 </body>
 </html>
