@@ -72,7 +72,7 @@
         <div class="logo-text text-xl font-light tracking-widest uppercase cursor-pointer select-none" onclick="showDashboard()">Lumina</div>
         
         <form id="search-form" class="flex w-full max-w-md relative mx-2">
-            <input type="text" id="search-input" placeholder="Search book or passage (e.g., Matthew, John 15)..." class="w-full py-2 pl-4 pr-12 rounded-full border outline-none transition-all duration-300 shadow-sm bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-sm text-black dark:text-white">
+            <input type="text" id="search-input" placeholder="Search book or passage (e.g., Matthew, John 15)..." class="w-full py-2 pl-4 pr-12 rounded-full border outline-none transition-all duration-300 shadow-sm bg-white dark:bg-zinc-800 border-gray-300 dark:border-zinc-700 text-sm text-neutral-900 dark:text-neutral-100 placeholder-gray-400 dark:placeholder-zinc-500">
             <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-indigo-500">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             </button>
@@ -93,8 +93,8 @@
             <div id="dashboard" class="space-y-12">
                 <div class="bg-gradient-to-br from-zinc-800 to-zinc-950 dark:from-zinc-900 dark:to-zinc-950 p-8 sm:p-12 rounded-3xl border border-zinc-800 text-center relative overflow-hidden shadow-xl text-white">
                     <span class="text-xs font-semibold tracking-widest uppercase opacity-60 block mb-6">Verse of the Day</span>
-                    <h1 id="votd-text" class="text-2xl sm:text-3xl reading-font font-light italic mb-6 leading-relaxed">"We know that all things work together for good..."</h1>
-                    <p id="votd-ref" class="text-sm tracking-wider font-medium opacity-70 mb-6">Romans 8:28</p>
+                    <h1 id="votd-text" class="text-2xl sm:text-3xl reading-font font-light italic mb-6 leading-relaxed">"Loading today's scripture..."</h1>
+                    <p id="votd-ref" class="text-sm tracking-wider font-medium opacity-70 mb-6">---</p>
                     <div class="flex justify-center gap-3">
                         <button onclick="readVotd()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full text-xs font-medium transition shadow-sm">Read Chapter</button>
                         <button onclick="copyVotd()" class="p-2 border border-zinc-700 rounded-full hover:bg-zinc-800 transition" title="Copy Text">
@@ -106,21 +106,21 @@
                 <div class="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 p-6 sm:p-8 rounded-3xl shadow-sm space-y-6">
                     <div class="flex justify-between items-center border-b border-gray-100 dark:border-zinc-800 pb-4">
                         <div>
-                            <h3 class="text-sm font-semibold tracking-widest uppercase section-heading">Daily Theology Quiz</h3>
-                            <p class="text-xs text-gray-400 mt-0.5">Test and build your biblical literacy</p>
+                        <h3 class="text-sm font-semibold tracking-widest uppercase text-indigo-600 dark:text-indigo-400">Theology Quiz Challenge</h3>
+                        <p class="text-xs text-neutral-600 dark:text-zinc-400 mt-0.5">Test and build your biblical literacy</p>
                         </div>
                         <div class="text-right">
-                            <span id="quiz-rank" class="text-xs font-bold text-indigo-500 uppercase tracking-wider block">Novice Disciple</span>
-                            <span id="quiz-score" class="text-[11px] font-medium opacity-60 ui-text-sub">Score: 0 pts</span>
+                            <span id="quiz-rank" class="text-xs font-bold text-indigo-500 dark:text-indigo-400 uppercase tracking-wider block">Novice Disciple</span>
+                            <span id="quiz-score" class="text-[11px] font-medium text-neutral-900 dark:text-neutral-100 block">Score: 0 pts</span>
                         </div>
                     </div>
                     
                     <div id="quiz-body" class="space-y-4">
                         <div class="flex justify-between items-center">
-                            <span id="quiz-question-num" class="text-[11px] font-bold tracking-wider text-indigo-500 uppercase">Question 1 of 3</span>
-                            <span id="quiz-category" class="text-[10px] bg-gray-100 dark:bg-zinc-800 px-2.5 py-1 rounded-full font-medium ui-text-sub">History</span>
+                            <span id="quiz-question-num" class="text-[11px] font-bold tracking-wider text-indigo-500 dark:text-indigo-400 uppercase">Challenge Panel</span>
+                            <span id="quiz-category" class="text-[10px] bg-gray-100 dark:bg-zinc-800 px-2.5 py-1 rounded-full font-medium text-neutral-900 dark:text-neutral-100">---</span>
                         </div>
-                        <h4 id="quiz-question-text" class="text-base font-medium ui-text-main leading-snug">Loading your daily challenge...</h4>
+                        <h4 id="quiz-question-text" class="text-base font-medium text-neutral-900 dark:text-white leading-snug">Loading your challenge...</h4>
                         <div id="quiz-options" class="grid gap-2.5 pt-2">
                             </div>
                     </div>
@@ -253,8 +253,8 @@
                 <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
                 <p id="audio-track-title" class="text-xs font-medium tracking-wide opacity-70 uppercase ui-text-main mr-4">Audio Engine</p>
                 
-                <select id="audio-voice-select" class="text-xs bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg px-2 py-1 outline-none ui-text-main max-w-[180px]">
-                    <option value="">Loading system voices...</option>
+                <select id="audio-voice-select" class="text-xs bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-lg px-2 py-1.5 outline-none text-neutral-900 dark:text-neutral-100 font-medium max-w-[180px]">
+                    <option value="" class="text-neutral-900 dark:text-white bg-white dark:bg-zinc-800">Loading system voices...</option>
                 </select>
             </div>
             <div class="flex items-center gap-6">
@@ -359,11 +359,26 @@
             }
         };
 
-        // Trivia Bank
+        // Seeded Rotating Verse of the Day Dataset
+        const votdBank = [
+            { ref: "Romans 8:28", text: "We know that all things work together for good for those who love God, to those who are called according to his purpose." },
+            { ref: "Psalm 46:1", text: "God is our refuge and strength, a very present help in trouble." },
+            { ref: "Proverbs 3:5", text: "Trust in Yahweh with all your heart, and don’t lean on your own understanding." },
+            { ref: "Isaiah 40:31", text: "But those who wait for Yahweh will renew their strength. They will mount up with wings like eagles." },
+            { ref: "Philippians 4:13", text: "I can do all things through Christ, who strengthens me." },
+            { ref: "Joshua 1:9", text: "Haven't I commanded you? Be strong and courageous. Don't be afraid, neither be dismayed: for Yahweh your God is with you wherever you go." },
+            { ref: "Matthew 6:33", text: "But seek first God’s Kingdom and his righteousness; and all these things will be given to you as well." }
+        ];
+
+        // Seeded Rotating Trivia Question Dataset
         const triviaBank = [
             { question: "Which prophet was sent to preach repentance to the city of Nineveh?", options: ["Isaiah", "Jonah", "Amos", "Hosea"], correct: 1, category: "History" },
             { question: "What does the term 'Gospel' (Greek: Euangelion) literally mean?", options: ["Holy Law", "Good News", "Sacred Scroll", "Divine Vision"], correct: 1, category: "Theology" },
-            { question: "Who was chosen as the king of Israel immediately after Saul?", options: ["Solomon", "Samuel", "David", "Jonathan"], correct: 2, category: "History" }
+            { question: "Who was chosen as the king of Israel immediately after Saul?", options: ["Solomon", "Samuel", "David", "Jonathan"], correct: 2, category: "History" },
+            { question: "In what city were the disciples first called 'Christians'?", options: ["Jerusalem", "Antioch", "Damascus", "Ephesus"], correct: 1, category: "History" },
+            { question: "Which of the Gospels is widely considered by scholars to have been written first?", options: ["Matthew", "Mark", "Luke", "John"], correct: 1, category: "Gospel Study" },
+            { question: "What was Paul's original Hebrew name before his apostolic ministry?", options: ["Saul", "Silas", "Simon", "Stephen"], correct: 0, category: "Biography" },
+            { question: "How many books are there in the standard New Testament canon?", options: ["39", "27", "12", "66"], correct: 1, category: "Canon" }
         ];
 
         const bibleBooksMeta = {
@@ -378,9 +393,16 @@
             "3 john": 1, "jude": 1, "revelation": 22
         };
 
-        let userData = JSON.parse(localStorage.getItem('lumina_bible_userdata')) || {
-            highlights: {}, notes: {}, quizScore: 0, currentQuizIdx: 0, planProgress: { gospels: [], wisdom: [] }
-        };
+       let userData = JSON.parse(localStorage.getItem('lumina_bible_userdata')) || {
+    highlights: {}, 
+    notes: {}, 
+    quizScore: 0, 
+    planProgress: { gospels: [], wisdom: [] }, 
+    currentQuizIndex: 0, 
+    hasAnsweredCurrent: false, 
+    userSelectedIdx: undefined,
+    lastCompletedDate: null // Tracks completion for the daily lockout
+};
 
         const plansConfig = {
             gospels: [
@@ -407,8 +429,6 @@
                 { id: "w5", label: "Day 5: The Good Shepherd", target: "Psalm 23" }
             ]
         };
-
-        const staticVotd = { ref: "Romans 8:28", text: "We know that all things work together for good for those who love God, to those who are called according to his purpose." };
 
         const body = document.body;
         const dashboard = document.getElementById('dashboard');
@@ -443,85 +463,121 @@
             renderQuizState();
         }
 
+        function getDailyIndex(maxItems) {
+            const now = new Date();
+            const start = new Date(now.getFullYear(), 0, 0);
+            const diff = now - start;
+            const oneDay = 1000 * 60 * 60 * 24;
+            const dayOfYear = Math.floor(diff / oneDay);
+            return dayOfYear % maxItems;
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('votd-text').textContent = `"${staticVotd.text}"`;
-            document.getElementById('votd-ref').textContent = staticVotd.ref;
+            // Synchronize stable text rotation for Verse of the Day
+            const dailyIndexVotd = getDailyIndex(votdBank.length);
+            const todayVotd = votdBank[dailyIndexVotd];
+            document.getElementById('votd-text').textContent = `"${todayVotd.text}"`;
+            document.getElementById('votd-ref').textContent = todayVotd.ref;
+
+            // Ensure running pointers match dataset parameters safely
+            if (userData.currentQuizIndex === undefined || userData.currentQuizIndex >= triviaBank.length) {
+                userData.currentQuizIndex = 0;
+            }
+
             updateProgressBars();
             renderQuizState();
         });
 
-        // Quiz Engine Logic
-        function renderQuizState() {
-            document.getElementById('quiz-score').textContent = `Score: ${userData.quizScore || 0} pts`;
-            updateQuizRankTitle();
+        // Fixed Progressive Quiz Interface with absolute Dark/Light Theme Contrast Colors
+        // 1. First function replaces the old renderQuizState
+function renderQuizState() {
+    document.getElementById('quiz-score').textContent = `Score: ${userData.quizScore || 0} pts`;
+    updateQuizRankTitle();
 
-            const idx = userData.currentQuizIdx || 0;
-            const optionsContainer = document.getElementById('quiz-options');
-            
-            if(idx >= triviaBank.length) {
-                document.getElementById('quiz-question-num').textContent = "Complete";
-                document.getElementById('quiz-category').textContent = "End";
-                document.getElementById('quiz-question-text').textContent = "You've finished your daily challenge! Come back tomorrow for brand new trivia concepts.";
-                optionsContainer.innerHTML = `<button onclick="resetQuizProgress()" class="py-2 px-4 rounded-xl text-xs bg-indigo-600 text-white font-medium hover:bg-indigo-700 mx-auto transition">Reset Progress</button>`;
-                return;
-            }
+    const optionsContainer = document.getElementById('quiz-options');
+    const currentIdx = userData.currentQuizIndex || 0;
+    const todayStr = new Date().toDateString();
+    
+    if (userData.lastCompletedDate === todayStr) {
+        document.getElementById('quiz-question-num').textContent = "Challenge Completed";
+        document.getElementById('quiz-category').textContent = "Locked";
+        document.getElementById('quiz-question-text').textContent = "You've completed today's competition! Come back tomorrow for new questions.";
+        optionsContainer.innerHTML = `<div class="text-center p-4 text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20 rounded-xl border border-emerald-200 dark:border-emerald-900">Leaderboard Position Secured</div>`;
+        return;
+    }
 
-            const currentQ = triviaBank[idx];
-            document.getElementById('quiz-question-num').textContent = `Question ${idx + 1} of ${triviaBank.length}`;
-            document.getElementById('quiz-category').textContent = currentQ.category;
-            document.getElementById('quiz-question-text').textContent = currentQ.question;
-            
-            optionsContainer.innerHTML = "";
-            currentQ.options.forEach((opt, optIdx) => {
-                const btn = document.createElement('button');
-                btn.className = "w-full text-left p-3 text-sm border rounded-xl font-medium transition duration-200 bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 hover:border-indigo-500 ui-text-main";
-                btn.textContent = opt;
-                btn.onclick = () => submitQuizAnswer(optIdx, btn);
-                optionsContainer.appendChild(btn);
-            });
-        }
+    const currentQ = triviaBank[currentIdx];
+    document.getElementById('quiz-question-num').textContent = `Question ${currentIdx + 1} of 3`;
+    document.getElementById('quiz-category').textContent = currentQ.category;
+    document.getElementById('quiz-question-text').textContent = currentQ.question;
+    
+    optionsContainer.innerHTML = "";
+    
+    currentQ.options.forEach((opt, optIdx) => {
+        const btn = document.createElement('button');
+        btn.className = "w-full text-left p-3 text-sm border rounded-xl font-medium transition duration-200 bg-white dark:bg-zinc-800 border-gray-300 dark:border-zinc-700 text-neutral-900 dark:text-neutral-100 hover:border-indigo-500 dark:hover:border-indigo-400";
+        btn.textContent = opt;
+        btn.onclick = () => submitQuizAnswer(optIdx, btn);
+        optionsContainer.appendChild(btn);
+    });
+}
 
-        function submitQuizAnswer(selectedIdx, clickedButton) {
-            const idx = userData.currentQuizIdx || 0;
-            const currentQ = triviaBank[idx];
-            const allButtons = document.getElementById('quiz-options').querySelectorAll('button');
+// 2. Second function replaces the old submitQuizAnswer
+function submitQuizAnswer(selectedIdx, clickedButton) {
+    const currentIdx = userData.currentQuizIndex || 0;
+    const currentQ = triviaBank[currentIdx];
+    const allButtons = document.getElementById('quiz-options').querySelectorAll('button');
 
-            allButtons.forEach(b => b.disabled = true);
+    allButtons.forEach(b => b.disabled = true);
+    
+    if (selectedIdx === currentQ.correct) {
+        clickedButton.className = "w-full text-left p-3 text-sm border rounded-xl font-semibold bg-emerald-100 dark:bg-emerald-950/40 border-emerald-500 text-emerald-800 dark:text-emerald-400";
+        userData.quizScore = (userData.quizScore || 0) + 10;
+    } else {
+        clickedButton.className = "w-full text-left p-3 text-sm border rounded-xl font-semibold bg-red-100 dark:bg-red-950/40 border-red-500 text-red-800 dark:text-red-400";
+        allButtons[currentQ.correct].className = "w-full text-left p-3 text-sm border rounded-xl font-semibold bg-emerald-100 dark:bg-emerald-950/40 border-emerald-500 text-emerald-800 dark:text-emerald-400";
+    }
 
-            if(selectedIdx === currentQ.correct) {
-                clickedButton.className = "w-full text-left p-3 text-sm border rounded-xl font-semibold bg-emerald-100 dark:bg-emerald-950/40 border-emerald-500 text-emerald-700 dark:text-emerald-400";
-                userData.quizScore = (userData.quizScore || 0) + 10;
-            } else {
-                clickedButton.className = "w-full text-left p-3 text-sm border rounded-xl font-semibold bg-red-100 dark:bg-red-950/40 border-red-500 text-red-700 dark:text-red-400";
-                allButtons[currentQ.correct].className = "w-full text-left p-3 text-sm border rounded-xl font-semibold bg-emerald-100 dark:bg-emerald-950/40 border-emerald-500 text-emerald-700 dark:text-emerald-400";
-            }
+    saveStorage();
 
-            setTimeout(() => {
-                userData.currentQuizIdx = idx + 1;
-                saveStorage();
-                renderQuizState();
-            }, 1800);
-        }
+    setTimeout(() => {
+        advanceQuizIndex();
+    }, 2000);
+}
+
+// 3. Third function replaces the old advanceQuizIndex
+function advanceQuizIndex() {
+    let nextIndex = (userData.currentQuizIndex || 0) + 1;
+    
+    if (nextIndex >= 3) {
+        userData.currentQuizIndex = 0; 
+        userData.lastCompletedDate = new Date().toDateString(); 
+    } else {
+        userData.currentQuizIndex = nextIndex;
+    }
+    
+    saveStorage();
+    renderQuizState();
+}
 
         function updateQuizRankTitle() {
             const s = userData.quizScore || 0;
             let rank = "Novice Disciple";
-            if (s >= 10 && s < 25) rank = "Dedicated Scribe";
-            if (s >= 25) rank = "Berean Scholar";
+            if (s >= 20 && s < 50) rank = "Dedicated Scribe";
+            if (s >= 50) rank = "Berean Scholar";
             document.getElementById('quiz-rank').textContent = rank;
         }
 
-        function resetQuizProgress() {
-            userData.quizScore = 0;
-            userData.currentQuizIdx = 0;
-            saveStorage();
-            renderQuizState();
+        function readVotd() { 
+            const dailyIndexVotd = getDailyIndex(votdBank.length);
+            fetchScripture(votdBank[dailyIndexVotd].ref); 
         }
-
-        function readVotd() { fetchScripture(staticVotd.ref); }
+        
         function copyVotd() {
-            navigator.clipboard.writeText(`${staticVotd.text} - ${staticVotd.ref}`);
-            alert("Verse copied elegantly to clipboard!");
+            const dailyIndexVotd = getDailyIndex(votdBank.length);
+            const todayVotd = votdBank[dailyIndexVotd];
+            navigator.clipboard.writeText(`${todayVotd.text} - ${todayVotd.ref}`);
+            alert("Verse copied to clipboard!");
         }
 
         document.getElementById('search-form').addEventListener('submit', (e) => {
@@ -629,22 +685,16 @@
             }
         }
 
-        // Smart Word Selector and Dictionary Engine Trigger
         function triggerContextMenu(e, verseKey) {
             e.stopPropagation();
             currentVerseSelection = verseKey;
             
-            // Look closely at what specific text was highlighted or double-clicked
             const selection = window.getSelection();
             const clickedText = selection.toString().trim();
-            
-            // Sanitize raw text to strip off trailing ancient punctuation
             const cleanWord = clickedText.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"']/g, "").toLowerCase();
 
-            // If an actual singular word block was intercepted, look it up immediately
             if (cleanWord.length > 1) {
                 let lookupWord = cleanWord;
-                // Handle standard plural variations safely
                 if (cleanWord.endsWith('s') && !theologicalDictionary[cleanWord]) {
                     lookupWord = cleanWord.slice(0, -1);
                 }
@@ -658,17 +708,14 @@
                 }
             }
 
-            // Sync: Skip narrative voice tracker directly to this targeted line item
             jumpAudioToVerse(verseKey);
 
-            // Fallback: If white space or regular single tap occurred, open standard notes utility
             contextMenu.style.position = 'fixed';
             contextMenu.style.top = `${e.clientY - 60}px`;
             contextMenu.style.left = `${Math.min(window.innerWidth - 220, e.clientX - 50)}px`;
             contextMenu.classList.remove('hidden');
         }
 
-        // Dedicated Biblical Dictionary View Sync
         function triggerDictionaryCard(data) {
             document.getElementById('dict-term').textContent = data.term;
             document.getElementById('dict-root').textContent = data.root;
@@ -677,7 +724,6 @@
             document.getElementById('dict-modal').classList.remove('hidden');
         }
 
-        // Third-Party Global Fallback API Engine Link
         async function fetchDefaultDictionary(word) {
             document.getElementById('dict-term').textContent = word;
             document.getElementById('dict-root').textContent = "English Lexicon";
@@ -695,10 +741,10 @@
 
                 document.getElementById('dict-root').textContent = `Grammar: ${partOfSpeech}`;
                 document.getElementById('dict-literal').textContent = definition;
-                document.getElementById('dict-context').textContent = "Standard linguistic translation. For deep biblical tenses, archeology settings, or temple currencies, try double-clicking explicit structural keywords (like 'Talent', 'Centurion', or 'Sanctification').";
+                document.getElementById('dict-context').textContent = "Standard linguistic translation. For deep biblical contexts, double-click explicit keywords like 'Talent' or 'Sanctification'.";
             } catch (err) {
                 document.getElementById('dict-literal').textContent = "Definition not found.";
-                document.getElementById('dict-context').textContent = "We could not find a clear definition for this specific selection. Try highlighting exactly one whole word cleanly.";
+                document.getElementById('dict-context').textContent = "Ensure you have highlighted exactly one single word clearly.";
             }
         }
 
@@ -765,7 +811,6 @@
             }
         }
 
-        // Feature 3: Native Highlighting and Autoscroll Core Voice Engine
         function loadSystemVoices() {
             availableVoices = window.speechSynthesis.getVoices();
             const voiceSelect = document.getElementById('audio-voice-select');
@@ -777,6 +822,7 @@
             englishVoices.forEach((voice) => {
                 const option = document.createElement('option');
                 option.value = voice.name;
+                option.className = "text-neutral-900 bg-white dark:text-white dark:bg-zinc-800";
                 const isPremium = voice.name.includes('Natural') || voice.name.includes('Enhanced') ? ' ✨' : '';
                 option.textContent = `${voice.name} (${voice.lang})${isPremium}`;
                 voiceSelect.appendChild(option);
@@ -830,8 +876,6 @@
 
             const currentElement = verseElementsArray[currentVerseIndex];
             currentElement.classList.add('audio-active');
-
-            // Autoscroll: Centers focused verse smoothly on client interface
             currentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
             const textToRead = currentElement.innerText.replace(/^\d+/, '').trim();
@@ -967,7 +1011,7 @@
 
         function updateProgressBars() {
             ['gospels', 'wisdom'].forEach(plan => {
-                const checkedCount = userData.planProgress[plan].length;
+                const checkedCount = userData.planProgress[plan] ? userData.planProgress[plan].length : 0;
                 const totalCount = plansConfig[plan].length;
                 const pct = Math.round((checkedCount / totalCount) * 100);
                 const el = document.getElementById(`plan-${plan}-progress`);
