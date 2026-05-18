@@ -54,6 +54,9 @@
         body.dark .hl-green  { background-color: rgba(134, 239, 172, 0.2); }
         body.dark .hl-blue   { background-color: rgba(147, 197, 253, 0.2); }
 
+        #verse-like-btn.text-red-500 { color: rgb(239, 68, 68); }
+        #verse-like-btn.fill-current { fill: currentColor; }
+
         #audio-dock.collapsed {
             width: auto;
             left: auto;
@@ -79,6 +82,12 @@
         </form>
 
         <div class="flex items-center gap-3">
+            <button id="toc-btn" onclick="showTableOfContents()" class="nav-icon p-2 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-800 transition" title="Table of Contents">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+            </button>
+            <button id="liked-verses-btn" onclick="showLikedVerses()" class="nav-icon p-2 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-800 transition" title="Liked Verses">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+            </button>
             <button id="parallel-toggle" class="p-2 rounded-full border border-gray-200 dark:border-zinc-800 text-xs font-medium uppercase tracking-wider hidden hover:bg-gray-100 dark:hover:bg-zinc-800 transition ui-text-main" onclick="toggleParallelMode()">Parallel</button>
             <button id="theme-toggle" class="nav-icon p-2 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-800 transition">
                 <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
@@ -154,13 +163,15 @@
             </div>
 
             <div id="plan-viewer" class="hidden space-y-6">
-                <button onclick="showDashboard()" class="text-xs font-medium opacity-50 hover:opacity-100 flex items-center gap-1 transition mb-4 ui-text-main">← Back to Dashboard</button>
+                <button onclick="showDashboard()" class="text-xs font-medium opacity-50 hover:opacity-100 flex items-center gap-1 transition mb-4 ui-text-main">← Home</button>
                 <h2 id="plan-title" class="text-2xl font-light section-heading"></h2>
                 <div id="plan-days-list" class="space-y-3"></div>
             </div>
 
             <div id="book-chapter-selector" class="hidden space-y-6">
-                <button onclick="showDashboard()" class="text-xs font-medium opacity-50 hover:opacity-100 flex items-center gap-1 transition mb-4 ui-text-main">← Dashboard</button>
+                <button onclick="showDashboard()" class="text-xs font-medium opacity-50 hover:opacity-100 flex items-center gap-0.5 transition mb-6 ui-text-main">← Home</button>
+
+                <button onclick="handleSmartBackAction()" class="text-xs font-medium opacity-50 hover:opacity-100 flex items-center gap-0.5 transition mb-6 ui-text-main">← Back</button>
                 <h2 id="selector-book-title" class="text-3xl font-light tracking-wide capitalize section-heading"></h2>
                 <p class="text-sm opacity-50 ui-text-sub">Select a chapter to begin reading:</p>
                 <div id="chapters-grid" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-3 pt-4">
@@ -175,7 +186,8 @@
             </div>
 
             <div id="scripture-container" class="hidden">
-                <button onclick="showDashboard()" class="text-xs font-medium opacity-50 hover:opacity-100 flex items-center gap-1 transition mb-6 ui-text-main">← Dashboard</button>
+                <button onclick="showDashboard()" class="text-xs font-medium opacity-50 hover:opacity-100 flex items-center gap-0.5 transition mb-6 ui-text-main">← Home</button>
+<button onclick="handleSmartBackAction()" class="text-xs font-medium opacity-50 hover:opacity-100 flex items-center gap-0.5 transition mb-6 ui-text-main">← Back</button>
                 <h2 id="reference-title" class="text-3xl font-light mb-8 text-center pb-4 border-b border-gray-200 dark:border-zinc-800 section-heading"></h2>
                 
                 <div id="reader-grid" class="grid grid-cols-1 gap-8 transition-all duration-300">
@@ -208,6 +220,9 @@
         <button onclick="applyHighlight('hl-blue')" class="w-5 h-5 rounded-full bg-blue-300/60 block border border-blue-400"></button>
         <button onclick="clearHighlight()" class="text-xs opacity-50 hover:opacity-100 font-medium px-1 ui-text-main">Clear</button>
         <div class="h-4 w-px bg-gray-200 dark:bg-zinc-700 mx-1"></div>
+        <button id="verse-like-btn" onclick="toggleLikeVerse()" class="p-1 rounded hover:bg-gray-100 dark:hover:bg-zinc-800 transition" title="Like this verse">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+        </button>
         <button onclick="openNoteModal()" class="text-xs font-medium text-indigo-500 hover:text-indigo-600 flex items-center gap-1">
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3 L7 19l-4 1 1-4L16.5 3.5z"></path></svg> Note
         </button>
@@ -247,6 +262,34 @@
         </div>
     </div>
 
+    <div id="liked-verses-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4" onclick="closeLikedVersesModal()">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-gray-200 dark:border-zinc-800 max-h-96 flex flex-col" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-200 dark:border-zinc-800">
+                <h2 class="text-base font-semibold ui-text-main">Liked Verses</h2>
+                <button onclick="closeLikedVersesModal()" class="p-1 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div id="liked-verses-list" class="space-y-3 overflow-y-auto flex-1">
+                <p class="text-xs text-neutral-500 dark:text-zinc-400 text-center py-4">No liked verses yet</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="toc-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4" onclick="closeTOCModal()">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-200 dark:border-zinc-800 max-h-96 flex flex-col" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-200 dark:border-zinc-800">
+                <h2 class="text-base font-semibold ui-text-main">Books of the Bible</h2>
+                <button onclick="closeTOCModal()" class="p-1 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div id="toc-content" class="space-y-2 overflow-y-auto flex-1">
+                <!-- TOC will be populated here -->
+            </div>
+        </div>
+    </div>
+
     <div id="audio-dock" class="fixed bottom-0 left-0 right-0 glass-nav py-4 px-6 sm:px-12 flex flex-col sm:flex-row justify-between items-center gap-4 z-40 hidden shadow-2xl transition-all duration-300">
         <div id="audio-controls-wrapper" class="w-full flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3 w-full sm:w-auto">
@@ -265,10 +308,6 @@
                 <button onclick="toggleAudio()" id="audio-play-btn" class="p-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg transition transform active:scale-95">
                     <svg id="audio-pause-svg" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
                     <svg id="audio-play-svg" class="hidden" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                </button>
-                
-                <button onclick="stopAudio()" class="p-2 border border-gray-300 dark:border-zinc-700 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-800 transition ui-text-main" title="Close Audio Track">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>
                 </button>
             </div>
         </div>
@@ -294,6 +333,7 @@
         let availableVoices = [];
         let currentUtterance = null;
         let speechSpeed = 1.0;
+        let isAudioPaused = false;
 
         // Specialized Rigorous Biblical & Cultural Lexicon Dataset
         const theologicalDictionary = {
@@ -393,9 +433,10 @@
             "3 john": 1, "jude": 1, "revelation": 22
         };
 
-       let userData = JSON.parse(localStorage.getItem('lumina_bible_userdata')) || {
+    let userData = JSON.parse(localStorage.getItem('lumina_bible_userdata')) || {
     highlights: {}, 
     notes: {}, 
+    likedVerses: [],
     quizScore: 0, 
     planProgress: { gospels: [], wisdom: [] }, 
     currentQuizIndex: 0, 
@@ -403,6 +444,25 @@
     userSelectedIdx: undefined,
     lastCompletedDate: null // Tracks completion for the daily lockout
 };
+
+// Ensure likedVerses exists in userData (for backward compatibility)
+if (!userData.likedVerses) {
+    userData.likedVerses = [];
+}
+
+let navigationHistory = { previousView: 'dashboard', contextData: null };
+
+        const chapterCounts = {
+            "genesis": 50, "exodus": 40, "leviticus": 27, "numbers": 36, "deuteronomy": 34, "joshua": 24, "judges": 21, "ruth": 4, 
+            "1 samuel": 31, "2 samuel": 24, "1 kings": 22, "2 kings": 25, "1 chronicles": 29, "2 chronicles": 36, "ezra": 10, 
+            "nehemiah": 13, "esther": 10, "job": 42, "psalms": 150, "proverbs": 31, "ecclesiastes": 12, "isaiah": 66, "jeremiah": 52, 
+            "lamentations": 5, "ezekiel": 48, "daniel": 12, "hosea": 14, "joel": 3, "amos": 9, "obadiah": 1, "jonah": 4, 
+            "micah": 7, "nahum": 3, "habakkuk": 3, "zephaniah": 3, "haggai": 2, "zechariah": 14, "malachi": 4,
+            "matthew": 28, "mark": 16, "luke": 24, "john": 21, "acts": 28, "romans": 16, "1 corinthians": 16, "2 corinthians": 13,
+            "galatians": 6, "ephesians": 6, "philippians": 4, "colossians": 4, "1 thessalonians": 5, "2 thessalonians": 3, "1 timothy": 6,
+            "2 timothy": 4, "titus": 3, "philemon": 1, "hebrews": 13, "james": 5, "1 peter": 5, "2 peter": 3, "1 john": 5, "2 john": 1,
+            "3 john": 1, "jude": 1, "revelation": 22
+        };
 
         const plansConfig = {
             gospels: [
@@ -450,18 +510,22 @@
         }
 
         function showDashboard() {
-            stopAudio();
-            scriptureContainer.classList.add('hidden');
-            planViewer.classList.add('hidden');
-            bookChapterSelector.classList.add('hidden');
-            error.classList.add('hidden');
-            loading.classList.add('hidden');
-            parallelToggle.classList.add('hidden');
-            dashboard.classList.remove('hidden');
-            mainWrapper.className = "w-full max-w-3xl";
-            window.scrollTo({top: 0, behavior: 'smooth'});
-            renderQuizState();
-        }
+    stopAudio();
+    scriptureContainer.classList.add('hidden');
+    planViewer.classList.add('hidden');
+    bookChapterSelector.classList.add('hidden');
+    error.classList.add('hidden');
+    loading.classList.add('hidden');
+    parallelToggle.classList.add('hidden');
+    dashboard.classList.remove('hidden');
+    mainWrapper.className = "w-full max-w-3xl";
+    window.scrollTo({top: 0, behavior: 'smooth'});
+    renderQuizState();
+    
+    // Reset history when cleanly arriving at home base
+    navigationHistory.previousView = 'dashboard';
+    navigationHistory.contextData = null;
+}
 
         function getDailyIndex(maxItems) {
             const now = new Date();
@@ -561,11 +625,21 @@ function advanceQuizIndex() {
 }
 
         function updateQuizRankTitle() {
-            const s = userData.quizScore || 0;
-            let rank = "Novice Disciple";
-            if (s >= 20 && s < 50) rank = "Dedicated Scribe";
-            if (s >= 50) rank = "Berean Scholar";
-            document.getElementById('quiz-rank').textContent = rank;
+    const s = userData.quizScore || 0;
+    let rank = "Novice Disciple";
+    
+    if (s >= 20 && s < 50)   rank = "Berean Searcher";
+    if (s >= 50 && s < 90)   rank = "Damascus Wayfarer";
+    if (s >= 90 && s < 140)  rank = "Nehemiah’s Builder";
+    if (s >= 140 && s < 200) rank = "Proverbs Scribe";
+    if (s >= 200 && s < 270) rank = "Luke’s Chronicler";
+    if (s >= 270 && s < 350) rank = "Patmos Seer";
+    if (s >= 350 && s < 440) rank = "Apollos Defender";
+    if (s >= 440 && s < 550) rank = "Abrahamic Pioneer";
+    if (s >= 550)            rank = "Melchizedek Scholar";
+    
+    document.getElementById('quiz-rank').textContent = rank;
+
         }
 
         function readVotd() { 
@@ -593,33 +667,42 @@ function advanceQuizIndex() {
         });
 
         function openBookSelector(bookKey) {
-            stopAudio();
-            dashboard.classList.add('hidden');
-            planViewer.classList.add('hidden');
-            scriptureContainer.classList.add('hidden');
-            error.classList.add('hidden');
-            loading.classList.add('hidden');
-            parallelToggle.classList.add('hidden');
-            
-            const titleEl = document.getElementById('selector-book-title');
-            const gridEl = document.getElementById('chapters-grid');
-            
-            titleEl.textContent = bookKey;
-            gridEl.innerHTML = "";
+    stopAudio();
+    dashboard.classList.add('hidden');
+    planViewer.classList.add('hidden');
+    scriptureContainer.classList.add('hidden');
+    error.classList.add('hidden');
+    loading.classList.add('hidden');
+    parallelToggle.classList.add('hidden');
+    
+    // Log that our parent state was the dashboard before entering here
+    navigationHistory.previousView = 'dashboard';
+    navigationHistory.contextData = null;
 
-            const totalChapters = bibleBooksMeta[bookKey];
-            for (let i = 1; i <= totalChapters; i++) {
-                const btn = document.createElement('button');
-                btn.className = "py-3 rounded-xl border border-gray-200 dark:border-zinc-800 text-sm font-medium hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 transition duration-150 bg-gray-50 dark:bg-zinc-900 text-neutral-900 dark:text-neutral-100 shadow-sm";
-                btn.textContent = i;
-                btn.onclick = () => fetchScripture(`${bookKey} ${i}`);
-                gridEl.appendChild(btn);
-            }
+    const titleEl = document.getElementById('selector-book-title');
+    const gridEl = document.getElementById('chapters-grid');
+    
+    titleEl.textContent = bookKey;
+    gridEl.innerHTML = "";
 
-            bookChapterSelector.classList.remove('hidden');
-            mainWrapper.className = "w-full max-w-3xl";
-            window.scrollTo({top: 0, behavior: 'smooth'});
-        }
+    const totalChapters = bibleBooksMeta[bookKey];
+    for (let i = 1; i <= totalChapters; i++) {
+        const btn = document.createElement('button');
+        btn.className = "py-3 rounded-xl border border-gray-200 dark:border-zinc-800 text-sm font-medium hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 transition duration-150 bg-gray-50 dark:bg-zinc-900 text-neutral-900 dark:text-neutral-100 shadow-sm";
+        btn.textContent = i;
+        btn.onclick = () => {
+            // Log that we came from this specific book grid before opening the text
+            navigationHistory.previousView = 'book-selector';
+            navigationHistory.contextData = bookKey;
+            fetchScripture(`${bookKey} ${i}`);
+        };
+        gridEl.appendChild(btn);
+    }
+
+    bookChapterSelector.classList.remove('hidden');
+    mainWrapper.className = "w-full max-w-3xl";
+    window.scrollTo({top: 0, behavior: 'smooth'});
+}
 
         async function fetchScripture(query, primaryOnlyParallelSync = false) {
             if (!query) return;
@@ -689,6 +772,16 @@ function advanceQuizIndex() {
             e.stopPropagation();
             currentVerseSelection = verseKey;
             
+            // Always show the context menu
+            jumpAudioToVerse(verseKey);
+            updateLikeButtonState();
+
+            contextMenu.style.position = 'fixed';
+            contextMenu.style.top = `${e.clientY - 60}px`;
+            contextMenu.style.left = `${Math.min(window.innerWidth - 220, e.clientX - 50)}px`;
+            contextMenu.classList.remove('hidden');
+            
+            // Also check for word lookup if text is selected
             const selection = window.getSelection();
             const clickedText = selection.toString().trim();
             const cleanWord = clickedText.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"']/g, "").toLowerCase();
@@ -701,19 +794,14 @@ function advanceQuizIndex() {
 
                 if (theologicalDictionary[lookupWord]) {
                     triggerDictionaryCard(theologicalDictionary[lookupWord]);
+                    contextMenu.classList.add('hidden');
                     return; 
                 } else {
                     fetchDefaultDictionary(cleanWord);
+                    contextMenu.classList.add('hidden');
                     return;
                 }
             }
-
-            jumpAudioToVerse(verseKey);
-
-            contextMenu.style.position = 'fixed';
-            contextMenu.style.top = `${e.clientY - 60}px`;
-            contextMenu.style.left = `${Math.min(window.innerWidth - 220, e.clientX - 50)}px`;
-            contextMenu.classList.remove('hidden');
         }
 
         function triggerDictionaryCard(data) {
@@ -851,21 +939,28 @@ function advanceQuizIndex() {
         }
 
         function toggleAudio() {
-            if (window.speechSynthesis.speaking) {
-                if (window.speechSynthesis.paused) {
-                    window.speechSynthesis.resume();
-                    setAudioPlaybackUIVisual(true);
-                } else {
-                    window.speechSynthesis.pause();
-                    setAudioPlaybackUIVisual(false);
-                }
-            } else {
+            // If paused, resume
+            if (isAudioPaused && window.speechSynthesis.speaking) {
+                window.speechSynthesis.resume();
+                isAudioPaused = false;
+                setAudioPlaybackUIVisual(true);
+            } 
+            // If currently speaking and not paused, pause
+            else if (window.speechSynthesis.speaking && !isAudioPaused) {
+                window.speechSynthesis.pause();
+                isAudioPaused = true;
+                setAudioPlaybackUIVisual(false);
+            } 
+            // Not speaking, start speaking
+            else {
+                isAudioPaused = false;
                 speakCurrentVerse();
             }
         }
 
         function speakCurrentVerse() {
             window.speechSynthesis.cancel();
+            isAudioPaused = false;
             
             if (currentVerseIndex >= verseElementsArray.length) {
                 stopAudio();
@@ -894,6 +989,7 @@ function advanceQuizIndex() {
             };
 
             currentUtterance.onerror = () => {
+                isAudioPaused = false;
                 setAudioPlaybackUIVisual(false);
             };
 
@@ -913,16 +1009,17 @@ function advanceQuizIndex() {
 
         function stopAudio() {
             window.speechSynthesis.cancel();
+            isAudioPaused = false;
             if(verseElementsArray) {
                 verseElementsArray.forEach(el => el.classList.remove('audio-active'));
             }
             setAudioPlaybackUIVisual(false);
-            audioDock.classList.add('hidden');
         }
 
         function setAudioSpeed(speed) {
             speechSpeed = speed;
-            if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+            // Only restart speech if audio is currently playing (not paused)
+            if (window.speechSynthesis.speaking && !isAudioPaused) {
                 speakCurrentVerse();
             }
             ['085', '10', '125'].forEach(id => {
@@ -1007,6 +1104,121 @@ function advanceQuizIndex() {
             const hasNote = userData.notes[key] ? " border-b-2 border-dotted border-indigo-400" : "";
             const hClass = userData.highlights[key] ? ` ${userData.highlights[key]}` : "";
             el.className = `verse-span${hClass}${hasNote}`;
+            
+            // Update like button state
+            const likeBtn = document.getElementById('verse-like-btn');
+            if (likeBtn && currentVerseSelection === key) {
+                updateLikeButtonState();
+            }
+        }
+
+        function toggleLikeVerse() {
+            if (!currentVerseSelection) return;
+            const idx = userData.likedVerses.indexOf(currentVerseSelection);
+            if (idx > -1) {
+                userData.likedVerses.splice(idx, 1);
+            } else {
+                userData.likedVerses.push(currentVerseSelection);
+            }
+            saveStorage();
+            updateLikeButtonState();
+        }
+
+        function updateLikeButtonState() {
+            const likeBtn = document.getElementById('verse-like-btn');
+            if (!likeBtn) return;
+            if (userData.likedVerses.includes(currentVerseSelection)) {
+                likeBtn.classList.add('text-red-500', 'fill-current');
+                likeBtn.classList.remove('text-gray-600', 'dark:text-gray-300');
+            } else {
+                likeBtn.classList.remove('text-red-500', 'fill-current');
+                likeBtn.classList.add('text-gray-600', 'dark:text-gray-300');
+            }
+        }
+
+        function showLikedVerses() {
+            const likedVersesModal = document.getElementById('liked-verses-modal');
+            const likedVersesList = document.getElementById('liked-verses-list');
+            
+            if (userData.likedVerses.length === 0) {
+                likedVersesList.innerHTML = '<p class="text-xs text-neutral-500 dark:text-zinc-400 text-center py-4">No liked verses yet</p>';
+            } else {
+                likedVersesList.innerHTML = userData.likedVerses.map(verseKey => `
+                    <div class="flex justify-between items-start gap-3 p-3 bg-gray-50 dark:bg-zinc-800 rounded-lg border border-gray-200 dark:border-zinc-700 hover:border-indigo-300 dark:hover:border-indigo-600 transition">
+                        <div class="flex-1">
+                            <p class="text-xs font-medium text-indigo-600 dark:text-indigo-400 mb-1">${verseKey}</p>
+                            <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">${userData.notes[verseKey] ? '📝 ' + userData.notes[verseKey].substring(0, 60) + '...' : 'No notes'}</p>
+                        </div>
+                        <button onclick="fetchScripture('${verseKey}'); closeLikedVersesModal();" class="text-xs px-2 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded transition">Read</button>
+                    </div>
+                `).join('');
+            }
+            likedVersesModal.classList.remove('hidden');
+        }
+
+        function closeLikedVersesModal() {
+            document.getElementById('liked-verses-modal').classList.add('hidden');
+        }
+
+        function showTableOfContents() {
+            const tocModal = document.getElementById('toc-modal');
+            const tocContent = document.getElementById('toc-content');
+            
+            const bibleBooks = [
+                { name: 'Genesis', abbr: 'Genesis' }, { name: 'Exodus', abbr: 'Exodus' }, { name: 'Leviticus', abbr: 'Leviticus' }, 
+                { name: 'Numbers', abbr: 'Numbers' }, { name: 'Deuteronomy', abbr: 'Deuteronomy' }, { name: 'Joshua', abbr: 'Joshua' },
+                { name: 'Judges', abbr: 'Judges' }, { name: 'Ruth', abbr: 'Ruth' }, { name: '1 Samuel', abbr: '1 Samuel' },
+                { name: '2 Samuel', abbr: '2 Samuel' }, { name: '1 Kings', abbr: '1 Kings' }, { name: '2 Kings', abbr: '2 Kings' },
+                { name: '1 Chronicles', abbr: '1 Chronicles' }, { name: '2 Chronicles', abbr: '2 Chronicles' }, { name: 'Ezra', abbr: 'Ezra' },
+                { name: 'Nehemiah', abbr: 'Nehemiah' }, { name: 'Esther', abbr: 'Esther' }, { name: 'Job', abbr: 'Job' },
+                { name: 'Psalms', abbr: 'Psalms' }, { name: 'Proverbs', abbr: 'Proverbs' }, { name: 'Ecclesiastes', abbr: 'Ecclesiastes' },
+                { name: 'Isaiah', abbr: 'Isaiah' }, { name: 'Jeremiah', abbr: 'Jeremiah' }, { name: 'Lamentations', abbr: 'Lamentations' },
+                { name: 'Ezekiel', abbr: 'Ezekiel' }, { name: 'Daniel', abbr: 'Daniel' }, { name: 'Hosea', abbr: 'Hosea' },
+                { name: 'Joel', abbr: 'Joel' }, { name: 'Amos', abbr: 'Amos' }, { name: 'Obadiah', abbr: 'Obadiah' },
+                { name: 'Jonah', abbr: 'Jonah' }, { name: 'Micah', abbr: 'Micah' }, { name: 'Nahum', abbr: 'Nahum' },
+                { name: 'Habakkuk', abbr: 'Habakkuk' }, { name: 'Zephaniah', abbr: 'Zephaniah' }, { name: 'Haggai', abbr: 'Haggai' },
+                { name: 'Zechariah', abbr: 'Zechariah' }, { name: 'Malachi', abbr: 'Malachi' }, { name: 'Matthew', abbr: 'Matthew' },
+                { name: 'Mark', abbr: 'Mark' }, { name: 'Luke', abbr: 'Luke' }, { name: 'John', abbr: 'John' },
+                { name: 'Acts', abbr: 'Acts' }, { name: 'Romans', abbr: 'Romans' }, { name: '1 Corinthians', abbr: '1 Corinthians' },
+                { name: '2 Corinthians', abbr: '2 Corinthians' }, { name: 'Galatians', abbr: 'Galatians' }, { name: 'Ephesians', abbr: 'Ephesians' },
+                { name: 'Philippians', abbr: 'Philippians' }, { name: 'Colossians', abbr: 'Colossians' }, { name: '1 Thessalonians', abbr: '1 Thessalonians' },
+                { name: '2 Thessalonians', abbr: '2 Thessalonians' }, { name: '1 Timothy', abbr: '1 Timothy' }, { name: '2 Timothy', abbr: '2 Timothy' },
+                { name: 'Titus', abbr: 'Titus' }, { name: 'Philemon', abbr: 'Philemon' }, { name: 'Hebrews', abbr: 'Hebrews' },
+                { name: 'James', abbr: 'James' }, { name: '1 Peter', abbr: '1 Peter' }, { name: '2 Peter', abbr: '2 Peter' },
+                { name: '1 John', abbr: '1 John' }, { name: '2 John', abbr: '2 John' }, { name: '3 John', abbr: '3 John' },
+                { name: 'Jude', abbr: 'Jude' }, { name: 'Revelation', abbr: 'Revelation' }
+            ];
+            
+            tocContent.innerHTML = bibleBooks.map(book => {
+                const chapterCount = chapterCounts[book.abbr.toLowerCase()] || 1;
+                return `
+                    <div class="group">
+                        <button onclick="showChapters('${book.abbr}', ${chapterCount})" class="w-full text-left px-3 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-zinc-800 rounded transition">
+                            ${book.name}
+                        </button>
+                    </div>
+                `;
+            }).join('');
+            
+            tocModal.classList.remove('hidden');
+        }
+
+        function showChapters(book, chapterCount) {
+            const tocContent = document.getElementById('toc-content');
+            tocContent.innerHTML = `
+                <button onclick="showTableOfContents()" class="w-full text-left px-3 py-2 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 mb-3">← Back to Books</button>
+                <div class="grid grid-cols-4 gap-2">
+                    ${Array.from({ length: chapterCount }, (_, i) => i + 1).map(ch => `
+                        <button onclick="fetchScripture('${book} ${ch}'); closeTOCModal();" class="p-2 text-xs font-medium bg-gray-50 dark:bg-zinc-800 hover:bg-indigo-100 dark:hover:bg-indigo-900 border border-gray-200 dark:border-zinc-700 hover:border-indigo-400 dark:hover:border-indigo-500 rounded transition text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">
+                            ${ch}
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function closeTOCModal() {
+            document.getElementById('toc-modal').classList.add('hidden');
         }
 
         function updateProgressBars() {
@@ -1020,31 +1232,36 @@ function advanceQuizIndex() {
         }
 
         function openPlan(planKey) {
-            dashboard.classList.add('hidden');
-            scriptureContainer.classList.add('hidden');
-            bookChapterSelector.classList.add('hidden');
-            const container = document.getElementById('plan-days-list');
-            container.innerHTML = "";
-            
-            document.getElementById('plan-title').textContent = planKey === 'gospels' ? 'The Gospels in 14 Days' : 'Wisdom Foundations';
-            
-            plansConfig[planKey].forEach(day => {
-                const isChecked = userData.planProgress[planKey].includes(day.id);
-                const item = document.createElement('div');
-                item.className = "bg-gradient-to-r from-zinc-800 to-zinc-900 border border-zinc-800 p-4 rounded-xl flex justify-between items-center text-white shadow-sm";
-                item.innerHTML = `
-                    <div class="flex items-center gap-3 cursor-pointer" onclick="fetchScripture('${day.target}')">
-                        <div class="p-2 rounded-lg bg-zinc-700/50 text-indigo-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-                        </div>
-                        <span class="text-sm font-medium hover:text-indigo-400 transition text-white">${day.label}</span>
-                    </div>
-                    <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="togglePlanDay('${planKey}', '${day.id}', this.checked)" class="w-4 h-4 rounded text-indigo-600 border-gray-300 focus:ring-indigo-500 accent-indigo-600">
-                `;
-                container.appendChild(item);
-            });
-            planViewer.classList.remove('hidden');
-        }
+    dashboard.classList.add('hidden');
+    scriptureContainer.classList.add('hidden');
+    bookChapterSelector.classList.add('hidden');
+    
+    // Log dashboard as parent layout
+    navigationHistory.previousView = 'dashboard';
+    navigationHistory.contextData = null;
+
+    const container = document.getElementById('plan-days-list');
+    container.innerHTML = "";
+    
+    document.getElementById('plan-title').textContent = planKey === 'gospels' ? 'The Gospels in 14 Days' : 'Wisdom Foundations';
+    
+    plansConfig[planKey].forEach(day => {
+        const isChecked = userData.planProgress[planKey].includes(day.id);
+        const item = document.createElement('div');
+        item.className = "bg-gradient-to-r from-zinc-800 to-zinc-900 border border-zinc-800 p-4 rounded-xl flex justify-between items-center text-white shadow-sm";
+        item.innerHTML = `
+            <div class="flex items-center gap-3 cursor-pointer" onclick="navigationHistory.previousView = 'plan-viewer'; navigationHistory.contextData = '${planKey}'; fetchScripture('${day.target}')">
+                <div class="p-2 rounded-lg bg-zinc-700/50 text-indigo-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                </div>
+                <span class="text-sm font-medium hover:text-indigo-400 transition text-white">${day.label}</span>
+            </div>
+            <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="togglePlanDay('${planKey}', '${day.id}', this.checked)" class="w-4 h-4 rounded text-indigo-600 border-gray-300 focus:ring-indigo-500 accent-indigo-600">
+        `;
+        container.appendChild(item);
+    });
+    planViewer.classList.remove('hidden');
+}
 
         function togglePlanDay(planKey, dayId, isChecked) {
             if(isChecked) {
@@ -1054,6 +1271,16 @@ function advanceQuizIndex() {
             }
             saveStorage();
         }
+        
+        function handleSmartBackAction() {
+    if (navigationHistory.previousView === 'book-selector' && navigationHistory.contextData) {
+        openBookSelector(navigationHistory.contextData);
+    } else if (navigationHistory.previousView === 'plan-viewer' && navigationHistory.contextData) {
+        openPlan(navigationHistory.contextData);
+    } else {
+        showDashboard();
+    }
+}
 
         const themeToggle = document.getElementById('theme-toggle');
         const moonIcon = document.getElementById('moon-icon');
